@@ -115,10 +115,13 @@ def scan():
 SEARCH TERM:
 %s""" % keyword
 
-		hits.append(twitter.read_tweet(account, keyword)) 
-		print len(hits)
+		try:
+			hits.append(twitter.read_tweet(account, keyword)) 
+		except:
+			# Prevent crash if twitter API blocks search
+			print '15 searches per 15 minutes exceeded'
+			time.sleep(5*60)
 		for hit in hits:
-#			print '%s\n%s' % (hit, message)
 			# Pass our response message to respond()
 			respond(hit, message) 
 		# Each iteration of the dictionary appended the next keword's hits to
@@ -138,8 +141,11 @@ def respond(tweet, message):
 		if DEBUG:
 			print 'DEBUG: Composing response'
 	
-		if record(name, text, myPost) == True:
-			print """ 
+		try:
+			if record(name, text, myPost) == True:
+				# Post response to twitter
+#				post(myPost)
+				print """ 
 TWEET FOUND:
 -------------------------------------------
 %s
@@ -150,7 +156,10 @@ RESPONSE SENT:
 %s
 -------------------------------------------"""% (name, text, myPost)
 
-#			post(myPost)
+		except:
+			# Prevent crash if twitter API blocks post
+			print '15 posts per 15 minutes exceeded'
+
 		else:
 			print '%s has been contacted before, ignoring their tweet:\n %s' % (name, text)
 
@@ -226,9 +235,9 @@ def main():
 	print 'TWEETBOT is running'
 	if DEBUG:
 		print 'DEBUG MODE ON'
-	print '-------------------'
+	print '------------------------'
 	print '%s  |  %sm' % (account, interval)
-	print '-------------------'
+	print '------------------------'
 	newFile()
 	matchPosts()
 
