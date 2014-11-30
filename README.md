@@ -22,3 +22,8 @@ Planned features
 - Include images with responses.
 - Send email updates of tweets found, responses sent etc. for analytics.
 - Allow for remote addition/editing of keywords and response messages via email.
+
+Please Note
+-----------
+The kitsune python script relies on my own twitter module which is not included in this
+repository.
