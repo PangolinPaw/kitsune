@@ -10,7 +10,10 @@ import os
 import string # Used to filter non-ASCII characters from tweets
 
 DEBUG = False	# Console outputs will appear if set to True
-interval = 1	# Time between twitter scans (minutes)
+SHUTDOWN = True	# If True, pi will auto shutdown after a set number of loops
+interval = 5	# Time between twitter scan loops (minutes)
+limit = 95	# Number of loops before shutdown
+
 
 account = 'DATA/puzzleIsland'	# API details stored in file with this name
 keyfile = 'key_words.txt'	# Search terms stored in file with this name
@@ -141,27 +144,18 @@ def respond(tweet, message):
 		if DEBUG:
 			print 'DEBUG: Composing response'
 	
-		try:
 			if record(name, text, myPost) == True:
 				# Post response to twitter
-#				post(myPost)
-				print """ 
-TWEET FOUND:
--------------------------------------------
-%s
-%s
--------------------------------------------
-RESPONSE SENT:
--------------------------------------------
-%s
--------------------------------------------"""% (name, text, myPost)
+				try:
+					post(myPost)
+					print "TWEET FOUND:\n-------------------------------------------\n%s\n%s\n-------------------------------------------\nRESPONSE SENT:\n-------------------------------------------\n%s\n-------------------------------------------" % (name, text, myPost)
 
-		except:
-			# Prevent crash if twitter API blocks post
-			print '15 posts per 15 minutes exceeded'
+				except:
+					# Prevent crash if twitter API blocks post
+				print '15 posts per 15 minutes exceeded'
 
-		else:
-			print '%s has been contacted before, ignoring their tweet:\n %s' % (name, text)
+			else:
+				print '%s has been contacted before, ignoring their tweet:\n %s' % (name, text)
 
 	else:
 		print 'No hits'
@@ -241,11 +235,18 @@ def main():
 	newFile()
 	matchPosts()
 
+	count = 0
 	while True:
 		hits = scan()
 		print '==========================================='
 		print 'Sleeping for %s min' % interval
 		time.sleep(interval*60)
-			
+		if SHUTDOWN == True:
+			count = count +1
+			if count > limit:
+				print 'shutdown'
+				post('Auto shutdown')
+				os.system('sudo halt')
+	
 if __name__ == '__main__':
 	main()
