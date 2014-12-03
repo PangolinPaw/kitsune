@@ -1,252 +1,233 @@
-##!/usr/bin/python
-# TWITTER AD BOT - TEST VERSION
-# ==============
-# Designed as a free alternative to twitter's advert feature, this program
-# scans twitter for key words and replies to all tweets with preset messages.
-# --------------
-import twitter
-import time
-import os
-import string # Used to filter non-ASCII characters from tweets
+#!/usr/bin/python
 
-DEBUG = False	# Console outputs will appear if set to True
-SHUTDOWN = True	# If True, pi will auto shutdown after a set number of loops
-interval = 5	# Time between twitter scan loops (minutes)
-limit = 95	# Number of loops before shutdown
+# KITSUNE v2.0
+# =======
+# Improved twitter interactions based on Twython
 
+from twython import Twython, TwythonError	# To interface with Twitter
+import time					# To regulate post and search rates
+import pickle					# To save and load API details
+import os					# To check for configuration files
+import string					# To filter out non-readable characters
 
-account = 'DATA/puzzleIsland'	# API details stored in file with this name
-keyfile = 'key_words.txt'	# Search terms stored in file with this name
-postHistory = 'DATA/postHistory.log'	# This program's posts recorded in file with this name
-messageFile = 'messages.txt'	# Your responses are retrieved from here
+# If set to True, the program prints notificatons at each stage of the search/record/reply process:
+DEBUG = False
+DEBUG2 = True
+# Bot will only post to twitter if this is set to True:
+POST = False
 
-# Default search terms & messages if none are set in keyFile or messageFile above
-defaultSearch = ['keyphrase01', 'keyphrase02']
-message00 = "We noticed you tweeted about %s and thought you might be interested in [url]" % defaultSearch[0]
-message01 = "Hello. We just saw your tweet about %s, why not take a look at [url]?" % defaultSearch[1]
-defaultMessage = [message00, message01]
+searchCount = 5	# How many tweets to return per search term
+interval = 5 # Delay (minutes) between each search/reply loop
 
-# -----------------------------------------------------------------------------------------
-# THE LINK WITH THE API IS SET UP AND MAINTAINED BY THIS BIT
-def newFile():
-# Checks id there's an API file present & creates one if not
-	# API details
-	Ckey = ' '
-	Csec = ' '
-	Atok = ' '
-	Asec = ' '
-	if os.path.exists(account + '.dat'):
-		if DEBUG:
-			print 'DEBUG: API details found'
-		return True
+# Configuration files:
+keyFile = 'DATA/API.dat'
+wordFile = 'key_words.txt'
+messageFile = 'response_text.txt'
+postHistory = 'DATA/postHistory.log'
+
+# If conficuration files have not been set up, the program uses the following search terms & replies:
+defaultSearch = ['testphrase01']
+defaultMessage = ['test response 01']
+
+# ---------------------------------------------------------------------------------------------
+# INITIALIZATION
+
+def setup():
+# Check for a file of API keys to use when accessing Twitter. If none exist, take them as an input.
+	if os.path.exists(keyFile):
+		if DEBUG: print 'D: API details found'
+		# Read API detals from file
+	        load_file = open(keyFile,'rb')
+	        load_data = pickle.load(load_file)
+	        load_file.close()
+	
+	        # Consumer keys relate to the app, access keys to the account
+	        CONSUMER_KEY = load_data['itemOne']
+	        CONSUMER_SECRET = load_data['itemTwo']
+	        ACCESS_KEY = load_data['itemThree']
+	        ACCESS_SECRET = load_data['itemFour']
+	
+	        # Save above details for future use
+	        api = Twython(CONSUMER_KEY,CONSUMER_SECRET,ACCESS_KEY,ACCESS_SECRET)
 	else:
-		if DEBUG:
-			print 'DEBUG: API details added'
-		twitter.new_account(account, Ckey, Csec, Atok, Asec)
-	return False
+		print 'No API details found. Please enter them now.'
+		while True:
+			# Take input of new keys
+		        CONSUMER_KEY = raw_input('CONSUMER KEY:    ')
+		        CONSUMER_SECRET = raw_input('CONSUMER SECRET: ')
+		        ACCESS_KEY = raw_input('ACCESS KEY:      ')
+		        ACCESS_SECRET = raw_input('ACCESS SECRET:   ')
+			
+			print "Thank you. \nThe keys cannot be changed once set, please check that they are correct.\n Enter 'Y' to continue, 'N' to re-enter the keys."
+			checked = raw_input(' > ')
+			if checked.upper() == 'Y':
+				# Save new API keys to file
+			        save_data = {'itemOne':str(CONSUMER_KEY),'itemTwo':str(CONSUMER_SECRET),'itemThree':str(ACCESS_KEY),'itemFour':str(ACCESS_SECRET)}
+			        save_file = open(keyFile,'wb')
+			        pickle.dump(save_data,save_file)
+			        save_file.close()
 
-# -------------------------------------------------------------------------------------
-# THESE BITS ARE ALL ABOUT SETTING THE KEYWORDS & THE MESSAGES WE WANT TO SEND IN RESPONSE
-def readKeywords():
+				# Save new keys for future use
+			        api = Twython(CONSUMER_KEY,CONSUMER_SECRET,ACCESS_KEY,ACCESS_SECRET)
+				break
+	return api
+
+# -------------------------------------------------------------------------------------------------
+# SET SEARCH TERMS & RESPONSES
+
+def search_terms():
 # Read the key words and phrases from the keyword file
-	if os.path.exists(keyfile):
-		# Read keywords
-		if DEBUG:
-				print 'DEBUG: Loading keywords'
-		readFile = open(keyfile, 'r', 0)
-		keywords = readFile.read()
-		readFile.close()
+        if os.path.exists(wordFile):
+                # Read keywords
+                if DEBUG: print 'D: Loading keywords'
+                readFile = open(wordFile, 'r', 0)
+                keywords = readFile.read()
+                readFile.close()
 
-		keywords = keywords.split('\n')
-		# Reading from a file adds an empty line, which we don't want in the list
-		keywords.pop()
-		return keywords
-	else:
-		# Create file with default keywords
-		if DEBUG:
-			print 'DEBUG: Using default keywords'
-		newFile = open(keyfile, 'w', 0)
-		for phrase in defaultSearch:
-			newFile.write('%s\n' % phrase)
-		newFile.close()
-		return defaultSearch
+                keywords = keywords.split('\n')
+                # Reading from a file adds an empty line, which we don't want in the list
+                keywords.pop()
+                return keywords
+        else:
+                # Create file with default keywords
+                if DEBUG: print 'D: Using default keywords'
+                newFile = open(wordFile, 'w', 0)
+                for phrase in defaultSearch:
+                        newFile.write('%s\n' % phrase)
+                newFile.close()
+                return defaultSearch
 
-def readMessage():
+def responses():
 # Reads preset tweets from message.txt
-	if os.path.exists(messageFile):
-		# Read messages
-		if DEBUG:
-			print 'DEBUG: Loading messages'
-		readFile = open(messageFile, 'r', 0)
-		messages = readFile.read()
-		readFile.close()
+        if os.path.exists(messageFile):
+                # Read messages
+                if DEBUG: print 'D: Loading messages'
+                readFile = open(messageFile, 'r', 0)
+                messages = readFile.read()
+                readFile.close()
 
-		messageList = messages.split('\n')
-		return messageList
-	else:
-		# No preset messages, create file with defaults
-		if DEBUG:
-			print 'DEBUG: Using default messages'
-		newFile = open(messageFile, 'w', 0)
-		for message in defaultMessage:
-			newFile.write('%s\n' % message)
-		newFile.close()
-		return defaultMessage
+                messageList = messages.split('\n')
+                return messageList
+        else:
+                # No preset messages, create file with defaults
+                if DEBUG: print 'D: Using default messages'
+                newFile = open(messageFile, 'w', 0)
+                for message in defaultMessage:
+                        newFile.write('%s\n' % message)
+                newFile.close()
+                return defaultMessage
 
 def matchPosts():
 # Matches keywords with messages so the correct reposne can be posted to each tweet found
-	if DEBUG:
-		print 'DEBUG: Creating dictionary of responses'
-	keywords = readKeywords()
-	messages = readMessage()
-	postDictionary = {}
-	for x in range(len(keywords)):
-		postDictionary[keywords[x]] = messages[x]
-		if DEBUG:
-			print postDictionary[keywords[x]]
-	return postDictionary
+        if DEBUG: print 'D: Creating dictionary of responses'
+        keywords = search_terms()
+        messages = responses()
+        postDictionary = {}
+        for x in range(len(keywords)):
+                postDictionary[keywords[x]] = messages[x]
+                if DEBUG:print postDictionary[keywords[x]]
+        return postDictionary
 
-# ---------------------------------------------------------------------------------------
-# THESE BITS ACTUALLY INTERRACT WITH TWITTER
-def scan():
-	postDictionary = matchPosts()
-	hits = []
-	for keyword, message in postDictionary.items():
-		# Search for tweets containing the keyword
-		print """ 
-===========================================
-SEARCH TERM:
-%s""" % keyword
+# ------------------------------------------------------------------------------------------------
+# POST & REPLY LOGGING
 
-		try:
-			hits.append(twitter.read_tweet(account, keyword)) 
-		except:
-			# Prevent crash if twitter API blocks search
-			print '15 searches per 15 minutes exceeded'
-			time.sleep(5*60)
-		for hit in hits:
-			# Pass our response message to respond()
-			respond(hit, message) 
-		# Each iteration of the dictionary appended the next keword's hits to
-		# the list. So wipe the hit list after each loop:
-		hits = []
-	return hits
-
-def respond(tweet, message):
-# Posts *message* to the owner of *tweet*
-	if tweet != []:
-		data = extract(tweet)
-		name = data[0]
-		text = data[1]
-
-
-		myPost = "@%s %s" % (name, message)
-		if DEBUG:
-			print 'DEBUG: Composing response'
-	
-			if record(name, text, myPost) == True:
-				# Post response to twitter
-				try:
-					post(myPost)
-					print "TWEET FOUND:\n-------------------------------------------\n%s\n%s\n-------------------------------------------\nRESPONSE SENT:\n-------------------------------------------\n%s\n-------------------------------------------" % (name, text, myPost)
-
-				except:
-					# Prevent crash if twitter API blocks post
-				print '15 posts per 15 minutes exceeded'
-
-			else:
-				print '%s has been contacted before, ignoring their tweet:\n %s' % (name, text)
-
-	else:
-		print 'No hits'
-
-def extract(tweet):
-# Extract useful data from tweet dictionary
-	dictionary = tweet[0]
-
-	text = dictionary['text']
-	# Remove emoji & non-roman characters
-	text = filter(lambda x: x in string.printable, text)
-	# Remove any empty lines that confuse the history check
-	text = text.replace('\n', '  ')
-
-	userPortion = dictionary['user'] # User details are in a sub-dictionary named 'user'
-	name = userPortion['screen_name']
-
-	return (name, text)
-
-def post(message):
-# Post preset tweet online
-	if DEBUG:
-		print 'DEBUG: Sending:\n%s' % message
-	twitter.tweet_function(account, message)
-
-# ----------------------------------------------------------------------------------------
-# THIS RECORDS ALL OF OUR TWEETS TO PREVENT SPAM & FOR ANALYTICS
 def record(customer, theirPost, myPost):
-# Makes a note of each tweet caught & what was sent in return 
-# RETURNS True IF THIS CUSTOMER HASN'T BEEN CONTACTED BEFORE
-	if os.path.exists(postHistory):
-		# Read all post history
-		if DEBUG:
-			print 'DEBUG: Loading post history'
-		historyFile = open(postHistory, 'r', 0)
-		history = historyFile.read()
-		historyFile.close()
-		history = history.split('\n')
+# Makes a note of each tweet caught & what was sent in return.
+# Returns True if this is the first time we've met the Twitter user.
+	customer = '@%s' % customer
+        if os.path.exists(postHistory):
+                # Read all post history
+                if DEBUG: print 'D: Loading post history'
+                historyFile = open(postHistory, 'r', 0)
+                history = historyFile.read()
+                historyFile.close()
+                history = history.split('\n')
+		
+                for line in history:
+                        logEntry = line.split('|')
+                        if customer in logEntry:
+				if DEBUG2: print '%s - %s' % (logEntry[0], customer)
+                                if DEBUG: print 'D: %s found in post history' % customer
+                                # We've tweeted at this customer before, ignore their tweet
+                                canReply = False
+				break
+                        else:
+                                # Never contacted this customer before, so save their details
+                                historyFile = open(postHistory, 'a', 0)
+                                historyFile.write('%s|%s|%s\n' % (customer, theirPost, myPost))
+                                historyFile.close()
+                                if DEBUG: print "D: Added record of %s's tweet to post history" % customer
+                                canReply = True
+				
+        else:
+                # No history file so create a new one with this first tweet included
+                if DEBUG:
+                        print 'D: Creating post history log'
+                newFile = open(postHistory, 'w', 0)
+                newFile.write('%s|%s|%s\n' % (customer, theirPost, myPost))
+                newFile.close()
+                if DEBUG: print "D: Added record of %s's tweet to post history" % customer
+                # No history log so we know we've never tweeted to this customer before
+                canReply = True
 
-		for line in history:
-			logEntry = line.split('|')
-			if customer in logEntry:
-				if DEBUG:
-					print 'DEBUG: %s found in post history' % customer
-				# We've tweeted at this customer before, ignore their tweet
-				return False
-			else:
-				# Never contacted this customer before, so save their details
-				historyFile = open(postHistory, 'a', 0)
-				historyFile.write('%s|%s|%s\n' % (customer, theirPost, myPost))
-				historyFile.close()	
-				if DEBUG:
-					print "DEBUG: Added record of %s's tweet to post history" % customer			
-				return True
-	else:
-		# No history file so create a new one with this first tweet included
-		if DEBUG:
-			print 'DEBUG: Creating post history log'
-		newFile = open(postHistory, 'w', 0)
-		newFile.write('%s|%s|%s\n' % (customer, theirPost, myPost))
-		newFile.close()
-		if DEBUG:
-				print "DEBUG: Added record of %s's tweet to post history" % customer
-		# No history log so we know we've never tweeted to this customer before
-		return True
+	if DEBUG2: print canReply
+	return canReply
 
 
-# ----------------------------------------------------------------------------------------
-# THIS IS THE MAIN LOOP OF THE PROGRAM THAT BRINGS ALL OF THE ABOVE TOGETHER
+# ------------------------------------------------------------------------------------------------
+# INTERACTIONS WITH TWITTER
+
+def search(api, postDictionary):
+# Search twitter for keywords
+
+
+	for keyword, message in postDictionary.items():
+		print '----------------------------------'
+		print 'Searching for %s...' % keyword
+		try:
+			hits = api.search(q=keyword, count=searchCount)
+			for tweet in hits['statuses']:
+				text = tweet['text']
+				text = clean(text)
+				user = tweet['user']['screen_name']
+				reply = '@%s %s' % (user, message)
+				
+				if record(user, text, reply) == True:
+					print 'TWEET FOUND:\n%s\n%s' % (user, text)
+					try:
+						if POST: api.update_status(status=reply, in_reply_to_status_id=tweet['id_str'])
+						print 'REPLY SENT:\n%s' % reply
+
+					except TwythonError as e:
+						print 'Send error:\n%s' % e
+					print '\n'
+				else:
+					print 'Ignored a tweet from %s' % user
+
+		except TwythonError as e:
+			print 'Search error:\n%s' % e
+
+# --------------------------------------------------------------------------------------------
+# SANITIZE TWEETS OF NON-READABLE CHARACTERS
+
+def clean(text):
+        # Remove emoji & non-roman characters
+        text = filter(lambda x: x in string.printable, text)
+        # Remove any empty lines that confuse the history check
+        text = text.replace('\n', '  ')
+	return text
+
+# ---------------------------------------------------------------------------------------------
+# MAIN LOOP
+
 def main():
-	print 'TWEETBOT is running'
-	if DEBUG:
-		print 'DEBUG MODE ON'
-	print '------------------------'
-	print '%s  |  %sm' % (account, interval)
-	print '------------------------'
-	newFile()
-	matchPosts()
-
-	count = 0
+	api = setup()	# Get access via API
 	while True:
-		hits = scan()
-		print '==========================================='
-		print 'Sleeping for %s min' % interval
-		time.sleep(interval*60)
-		if SHUTDOWN == True:
-			count = count +1
-			if count > limit:
-				print 'shutdown'
-				post('Auto shutdown')
-				os.system('sudo halt')
-	
+		postDictionary = matchPosts()	# Associate keywords with responses
+		search(api, postDictionary)	# Search twitter for keywords & post responses
+		if DEBUG: print 'D: Sleeping for %s min' % interval
+		time.sleep(interval * 60)
+
+
 if __name__ == '__main__':
 	main()
