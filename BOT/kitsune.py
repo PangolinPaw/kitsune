@@ -11,10 +11,13 @@ import os					# To check for configuration files
 import string					# To filter out non-readable characters
 
 # If set to True, the program prints notificatons at each stage of the search/record/reply process:
-DEBUG = False
-DEBUG2 = True
+DEBUG = True
+DEBUG2 = False
 # Bot will only post to twitter if this is set to True:
-POST = False
+POST = True
+
+SHUTDOWN = True	# If true, Pi will shut down after...
+LIMIT = 95	# ...This many search/response loops
 
 searchCount = 5	# How many tweets to return per search term
 interval = 5 # Delay (minutes) between each search/reply loop
@@ -221,11 +224,19 @@ def clean(text):
 # MAIN LOOP
 
 def main():
+	loopCount = 0
 	api = setup()	# Get access via API
 	while True:
 		postDictionary = matchPosts()	# Associate keywords with responses
 		search(api, postDictionary)	# Search twitter for keywords & post responses
 		if DEBUG: print 'D: Sleeping for %s min' % interval
+
+		loopCount = loopCount +1
+		if loopCount > LIMIT:
+			if SHUTDOWN:
+				api.update_status(status='Auto Shutdown')
+				os.system('sudo halt')
+
 		time.sleep(interval * 60)
 
 
