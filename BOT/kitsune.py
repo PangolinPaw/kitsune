@@ -2,7 +2,7 @@
 
 # KITSUNE v2.0
 # =======
-# Improved twitter interactions based on Twython
+# Twitter bot that automatically replies to tweets containing specific key words.
 
 from twython import Twython, TwythonError	# To interface with Twitter
 import time					# To regulate post and search rates
@@ -14,7 +14,7 @@ import string					# To filter out non-readable characters
 DEBUG = True
 DEBUG2 = False
 # Bot will only post to twitter if this is set to True:
-POST = True
+POST = False
 
 SHUTDOWN = True	# If true, Pi will shut down after...
 LIMIT = 95	# ...This many search/response loops
@@ -155,12 +155,15 @@ def record(customer, theirPost, myPost):
                                 canReply = False
 				break
                         else:
-                                # Never contacted this customer before, so save their details
-                                historyFile = open(postHistory, 'a', 0)
-                                historyFile.write('%s|%s|%s\n' % (customer, theirPost, myPost))
-                                historyFile.close()
-                                if DEBUG: print "D: Added record of %s's tweet to post history" % customer
                                 canReply = True
+		
+		if canReply == True:
+			# Never contacted this customer before, so save their details
+			historyFile = open(postHistory, 'a', 0)
+			historyFile.write('%s|%s|%s\n' % (customer, theirPost, myPost))
+			historyFile.close()
+			if DEBUG: print "D: Added record of %s's tweet to post history" % customer
+
 				
         else:
                 # No history file so create a new one with this first tweet included
