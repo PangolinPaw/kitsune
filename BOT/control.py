@@ -66,11 +66,11 @@ def menu():
 
 		elif selection == '3':
 # View postHistory.log
-			print '3'
+			viewHistory()
 
 		elif selection == '4':
 # Update process
-			print '4'
+			print 'This feature has not been implemented'
 	
 		elif selection == '5':
 # Shutdown menu
@@ -101,7 +101,30 @@ def menu():
 		time.sleep(2)
 
 # ---------------------------------------------------------------------------
-# FILE EDITING
+# FILE MANIPULATION
+
+def viewHistory():
+	timeStamp = 0
+	newFile = open(postHistory, 'r', 0)
+	history = newFile.read()
+	newFile.close()
+
+	history = history.split('\n')
+	history.pop()
+
+	print '%s post(s) recorded' %  len(history)
+	for line in history:
+		print
+		line = line.split('|')
+		pastTimeStamp = timeStamp
+		timeStamp = line[0]
+		if timeStamp != pastTimeStamp:
+			print '-----%s-----' % timeStamp
+		print 'USER: \n%s' % line[1]
+		print 'TWEET: \n%s' % line[2]
+		print 'RESPONSE: \n%s' % line[3]
+
+	proceed = raw_input('\nPress Enter to continue')	
 
 def changeTerms():
 	postDictionary = matchPosts()
