@@ -25,15 +25,14 @@ def menu():
              User Interface
 ----------------------------------------
 ========================================
-        MAIN MENU
-        1 > Start Twitter Bot
-        2 > Search Terms and Responses
-        3 > View Interaction History
-        4 > Check for Updates
-        5 > Shutdown"""
+     MAIN MENU
+ 1 > Start Twitter Bot
+ 2 > Search Terms and Responses
+ 3 > View Interaction History
+ 4 > Check for Updates
+ 5 > Shutdown"""
 
-		selection = raw_input('\n          > ')
-		print '----------------------------------------'
+		selection = raw_input('\n   > ')
 
 		if selection == '1':
 # Run KITSUNE Twitter bot
@@ -43,9 +42,27 @@ def menu():
 			print '\n Twitter bot stopped. Returning to main menu.'
 		elif selection == '2':
 # Set Keywords/Responses
-			print """ 
-       SEARCH SETTINGS"""
-			changeTerms()
+			while True:
+				os.system('clear')
+				print """ 
+----------------------------------------
+                KITSUNE
+             User Interface
+----------------------------------------
+========================================
+     SEARCH SETTINGS
+ 1 > Review search term/response pairs
+ 2 > Add new pair
+ 3 > Return to main menu"""
+				selection = raw_input('\n   > ')
+				if selection == '1':
+					changeTerms()
+				if selection == '2':
+					addTerm()
+				if selection == '3':
+					break
+				else:
+					print 'Invalid selection, please try again'
 
 		elif selection == '3':
 # View postHistory.log
@@ -58,11 +75,16 @@ def menu():
 		elif selection == '5':
 # Shutdown menu
 			print """
-        SHUTDOWN MENU
-        0 > Go Back
-        1 > Shutdown
-        2 > Restart"""
-			selection = raw_input('           > ')
+----------------------------------------
+                KITSUNE
+             User Interface
+----------------------------------------
+========================================
+     SHUTDOWN MENU
+ 0 > Go Back
+ 1 > Shutdown
+ 2 > Restart"""
+			selection = raw_input('\n   > ')
 			if selection == '0':
 				break
 			elif selection == '1':
@@ -84,29 +106,57 @@ def menu():
 def changeTerms():
 	postDictionary = matchPosts()
 	items = len(postDictionary)
-	print 'There is/are currently %s search term/reponse pairs:' % items
+	os.system('clear')
+	print """ 
+----------------------------------------
+                KITSUNE
+             User Interface
+----------------------------------------
+========================================
+     REVIEW SEARCH TERMS & RESPONSES"""
+
+	if items < 1:
+		postDictionary['TEST_SEARCH_TERM_01'] = 'TEST RESPONSE MESSAGE 01'
+		print 'There were no search term/response pairs, but the list cannot be left blank. A placeholder has been added:'
+	else:
+		print 'There is currently %s search term/reponse pair(s):' % items
 	count = 0
 	for search, response in postDictionary.items():
 		count = count +1
 		while True:
 			print """ 
-SEARCH %s: %s
-RESPONSE : %s""" % (count, search, response)
-			print """ 
+SEARCH %s:
+ %s
+RESPONSE:
+ %s
+
 Would you like to change this pair?
  0 > Leave them as they are
  1 > Change search term
  2 > Change response
- 3 > Delete the pair"""
-			selection = raw_input('\n > ')
+ 3 > Delete pair (list cannot be blank)""" % (count, search, response)
+
+			selection = raw_input('\n   > ')
 			if selection == '0':
+# Move to next pair
 				print 'Pair unchanged'
 				break
 			elif selection == '1':
-				print 'Change search term'
+# Change search term
+				print 'Change search term to:'
+				newSearch = raw_input(' > ')
+				# Create new key with newSearch & add original response to it
+				postDictionary[newSearch] = response
+				# Remove the old search
+				del postDictionary[search]
+				print 'Search term changed'
 				break
 			elif selection == '2':
-				print 'Change response'
+# Change response
+				print 'Change response to:'
+				newResponse = raw_input(' > ')
+				postDictionary[search] = newResponse
+				print 'Response changed'
 				break
 			elif selection == '3':
 				print 'Delete pair'
@@ -114,9 +164,41 @@ Would you like to change this pair?
 				break
 			else:
 				print 'Invalid selection, please try again.'
-
+	convertToList(postDictionary)
 	proceed = raw_input('Press Enter to continue')
 
+def addTerm():
+	postDictionary = matchPosts()
+	print 'Enter new search term (use - to indicate words to exclude):'
+	search = raw_input(' > ')
+	print "Enter new response message (the user's Twitter name is added automatically as the 1st word):"
+	response = raw_input(' > ')
+	postDictionary[search] = response
+	convertToList(postDictionary)
+
+# --------------------------------------------------------------------------------------
+# WRITE FILES
+
+def convertToList(dictionary):
+# Converts the dictionary into two lists, one for keys and one for responses
+	keys = []
+	items = []
+	for search, response in dictionary.items():
+		keys.append(search)
+		items.append(response)
+
+	newFile = open(wordFile, 'w', 0)
+	for item in keys:
+		newFile.write('%s\n' % item)
+	newFile.close()
+
+	newFile = open(messageFile, 'w', 0)
+	for item in items:
+		newFile.write('%s\n' % item)
+	newFile.close()
+
+# ---------------------------------------------------------------------------------------
+# RETRIEVE SEARCH TERMS & RESPONSES
 def search_terms():
 # Read the key words and phrases from the keyword file
         if os.path.exists(wordFile):
