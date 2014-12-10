@@ -6,9 +6,11 @@
 import time
 import os
 
-wordFile = 'key_words.txt'
-messageFile = 'response_text.txt'
-postHistory = 'DATA/postHistory.log'
+filepath = '/home/pi/kitsune/BOT/'
+
+wordFile = '%skey_words.txt' % filepath
+messageFile = '%sresponse_text.txt' % filepath
+postHistory = '%sDATA/postHistory.log' % filepath
 
 defaultSearch = ['TEST_SEARCH_TERM']
 defaultMessage = ['TEST_RESPONSE_MESSAGE']
@@ -38,7 +40,7 @@ def menu():
 # Run KITSUNE Twitter bot
 			print 'The Twitter bot will now start. Press Ctrl + C to stop and return to the main menu.'
 			time.sleep(2)
-			os.system('sudo python kitsune.py')
+			os.system('sudo python %skitsune.py' % filepath)
 			print '\n Twitter bot stopped. Returning to main menu.'
 		elif selection == '2':
 # Set Keywords/Responses
@@ -66,8 +68,30 @@ def menu():
 
 		elif selection == '3':
 # View postHistory.log
-			viewHistory()
-
+			history = viewHistory()
+			while True:
+				os.system('clear')
+				print """ 
+----------------------------------------
+                KITSUNE
+             User Interface
+----------------------------------------
+========================================
+     INTERACTION HISTORY
+  Would you like an email copy?
+ 1 > Yes
+ 2 > No"""
+				selection = raw_input('\n   > ')
+				if selection == '1':
+				# Email file
+					print '1'
+				elif selection == '2':
+				# Return to menu
+					break
+				else:
+					print 'Invalid selection, please try again'
+					time.sleep(1)
+			
 		elif selection == '4':
 # Update process
 			print 'This feature has not been implemented'
@@ -93,7 +117,6 @@ def menu():
 				os.system('sudo reboot')
 			else:
 				print 'Invalid selection: Please try again.'
-
 		else:
 # Invalid selection error capture
 			print 'Invalid selection: Please try again.'
@@ -123,8 +146,9 @@ def viewHistory():
 		print 'USER: \n%s' % line[1]
 		print 'TWEET: \n%s' % line[2]
 		print 'RESPONSE: \n%s' % line[3]
+	input = raw_input('\nPress Enter to continue')
 
-	proceed = raw_input('\nPress Enter to continue')	
+	return history
 
 def changeTerms():
 	postDictionary = matchPosts()
@@ -187,6 +211,8 @@ Would you like to change this pair?
 				break
 			else:
 				print 'Invalid selection, please try again.'
+				time.sleep(1)
+
 	convertToList(postDictionary)
 	proceed = raw_input('Press Enter to continue')
 
