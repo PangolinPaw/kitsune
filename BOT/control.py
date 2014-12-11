@@ -5,6 +5,7 @@
 
 import time
 import os
+import sendHistory
 
 filepath = '/home/pi/kitsune/BOT/'
 
@@ -84,7 +85,14 @@ def menu():
 				selection = raw_input('\n   > ')
 				if selection == '1':
 				# Email file
-					print '1'
+#					try:
+					print "Please specify the recipient's email:"
+					to = raw_input(' > ')
+					sendHistory.sendAll(to, history)
+					print 'History has been sent successfully'
+					break
+#					except:
+#						print 'Error: Email failed to send.'
 				elif selection == '2':
 				# Return to menu
 					break
@@ -98,7 +106,10 @@ def menu():
 	
 		elif selection == '5':
 # Shutdown menu
-			print """
+			while True:
+				os.system('clear')
+	
+				print """
 ----------------------------------------
                 KITSUNE
              User Interface
@@ -108,15 +119,15 @@ def menu():
  0 > Go Back
  1 > Shutdown
  2 > Restart"""
-			selection = raw_input('\n   > ')
-			if selection == '0':
-				break
-			elif selection == '1':
-				os.system('sudo halt')
-			elif selection == '2':
-				os.system('sudo reboot')
-			else:
-				print 'Invalid selection: Please try again.'
+				selection = raw_input('\n   > ')
+				if selection == '0':
+					break
+				elif selection == '1':
+					os.system('sudo halt')
+				elif selection == '2':
+					os.system('sudo reboot')
+				else:
+					print 'Invalid selection: Please try again.'
 		else:
 # Invalid selection error capture
 			print 'Invalid selection: Please try again.'
