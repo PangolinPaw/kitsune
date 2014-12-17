@@ -102,7 +102,9 @@ def menu():
 			
 		elif selection == '4':
 # Update process
-			print 'This feature has not been implemented'
+			print 'Please wait'
+			os.system('sudo git pull origin master')
+			print 'Restart the system for the updates to take effect.'
 	
 		elif selection == '5':
 # Shutdown menu
