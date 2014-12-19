@@ -16,6 +16,8 @@ postHistory = '%sDATA/postHistory.log' % filepath
 defaultSearch = ['TEST_SEARCH_TERM']
 defaultMessage = ['TEST_RESPONSE_MESSAGE']
 
+AUTORUN = False
+
 # ---------------------------------------------------------------
 # MENU
 
@@ -102,9 +104,18 @@ def menu():
 			
 		elif selection == '4':
 # Update process
-			print 'Please wait'
+			print """
+----------------------------------------
+                KITSUNE
+             User Interface
+----------------------------------------
+========================================
+     UPDATING
+   > Please wait"""
 			os.system('sudo git pull origin master')
-			print 'Restart the system for the updates to take effect.'
+			print """ 
+   > . . .
+   > The software is now up to date, please re-start the system."""
 	
 		elif selection == '5':
 # Shutdown menu
@@ -311,6 +322,12 @@ def matchPosts():
 
 # --------------------------------------------------------------------------
 if __name__ == '__main__':
+	# Autorun the bot once program starts
+	if AUTORUN == True:
+	        if os.path.exists(postHistory):
+			os.system('sudo python %skitsune.py' % filepath)
+
+	# Start the main menu
 	while True:
 		try:
 			menu()
