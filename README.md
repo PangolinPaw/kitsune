@@ -29,3 +29,13 @@ Please Note
 ------------------------
 The kitsune bot relies on a Twitter API. On the first run of the program you will need to
 input all four keys.
+
+Work in Progress
+------------------------
+The control.py script needs to be set to run on boot and the pi needs to automatically reboot
+every 24hrs (via cron). This will ensure software updates that require a reboot are 
+implemented after download without the need for human intervention.
+
+A 'First run' function placeholder needs to be included in the control.py script. This will
+allow for future versions to carry out specific tasks immediately after the script starts
+post reboot.
