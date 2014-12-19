@@ -9,24 +9,27 @@ import time					# To regulate post and search rates
 import pickle					# To save and load API details
 import os					# To check for configuration files
 import string					# To filter out non-readable characters
+import datetime					# To add timestamps to post history logs
 
 # If set to True, the program prints notificatons at each stage of the search/record/reply process:
-DEBUG = True
+DEBUG = False
 DEBUG2 = False
 # Bot will only post to twitter if this is set to True:
-POST = False
+POST = True
 
-SHUTDOWN = True	# If true, Pi will shut down after...
-LIMIT = 95	# ...This many search/response loops
+SHUTDOWN = False# If true, Pi will shut down after...
+LIMIT = 95	# ...this many search/response loops
 
 searchCount = 5	# How many tweets to return per search term
-interval = 5 # Delay (minutes) between each search/reply loop
+interval = 5 	# Delay (minutes) between each search/reply loop
 
 # Configuration files:
-keyFile = 'DATA/API.dat'
-wordFile = 'key_words.txt'
-messageFile = 'response_text.txt'
-postHistory = 'DATA/postHistory.log'
+filepath = '/home/pi/kitsune/BOT/'
+
+keyFile = '%sDATA/API.dat' % filepath
+wordFile = '%skey_words.txt' % filepath
+messageFile = '%sresponse_text.txt' % filepath
+postHistory = '%sDATA/postHistory.log' % filepath
 
 # If conficuration files have not been set up, the program uses the following search terms & replies:
 defaultSearch = ['testphrase01']
@@ -160,7 +163,7 @@ def record(customer, theirPost, myPost):
 		if canReply == True:
 			# Never contacted this customer before, so save their details
 			historyFile = open(postHistory, 'a', 0)
-			historyFile.write('%s|%s|%s\n' % (customer, theirPost, myPost))
+			historyFile.write('%s|%s|%s|%s\n' % (timestamp(),customer, theirPost, myPost))
 			historyFile.close()
 			if DEBUG: print "D: Added record of %s's tweet to post history" % customer
 
@@ -170,7 +173,7 @@ def record(customer, theirPost, myPost):
                 if DEBUG:
                         print 'D: Creating post history log'
                 newFile = open(postHistory, 'w', 0)
-                newFile.write('%s|%s|%s\n' % (customer, theirPost, myPost))
+                newFile.write('%s|%s|%s|%s\n' % (timestamp(),customer, theirPost, myPost))
                 newFile.close()
                 if DEBUG: print "D: Added record of %s's tweet to post history" % customer
                 # No history log so we know we've never tweeted to this customer before
@@ -179,6 +182,10 @@ def record(customer, theirPost, myPost):
 	if DEBUG2: print canReply
 	return canReply
 
+def timestamp():
+        now = datetime.datetime.now()
+        currentTime = now.strftime('%d.%m.%y %H:%M')
+        return currentTime
 
 # ------------------------------------------------------------------------------------------------
 # INTERACTIONS WITH TWITTER
@@ -188,8 +195,7 @@ def search(api, postDictionary):
 
 
 	for keyword, message in postDictionary.items():
-		print '----------------------------------'
-		print 'Searching for %s...' % keyword
+		print "SEARCHING FOR: '%s'\n" % keyword
 		try:
 			hits = api.search(q=keyword, count=searchCount)
 			for tweet in hits['statuses']:
@@ -213,6 +219,8 @@ def search(api, postDictionary):
 		except TwythonError as e:
 			print 'Search error:\n%s' % e
 
+		print '-------------------------------------------\n'
+
 # --------------------------------------------------------------------------------------------
 # SANITIZE TWEETS OF NON-READABLE CHARACTERS
 
@@ -230,17 +238,27 @@ def main():
 	loopCount = 0
 	api = setup()	# Get access via API
 	while True:
+		os.system('clear')
+		print """ 
+-------------------------------------------
+                 KITSUNE
+        Twitter Interaction Bot
+-------------------------------------------
+ Press Ctrl + C to return to the Main Menu
+-------------------------------------------
+Interval: %smin            Auto Halt: %s
+===========================================""" % (interval, SHUTDOWN)
+
 		postDictionary = matchPosts()	# Associate keywords with responses
 		search(api, postDictionary)	# Search twitter for keywords & post responses
 		if DEBUG: print 'D: Sleeping for %s min' % interval
+		time.sleep(interval * 60)
 
 		loopCount = loopCount +1
 		if loopCount > LIMIT:
 			if SHUTDOWN:
-				api.update_status(status='Auto Shutdown')
-				os.system('sudo halt')
+				break
 
-		time.sleep(interval * 60)
 
 
 if __name__ == '__main__':
