@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
 import gmail
+import datetime
 
-sender = 'botkitsune@gmail.com'
-password = 'kitsune2211'
+sender = 'xxx'
+password = 'xxx'
 
 def sendAll(to, content):
 	subject = 'KITSUNE: Full interaction history (manual request)'
@@ -25,7 +26,7 @@ def sendAll(to, content):
 	
 	gmail.message(sender, password, to, subject, message)
 
-def sendRecent(to, allContent):
+def sendRecent(to, content):
 	subject = 'KITSUNE: Recent interaction history.'
 	message = "Below are all the Twitter interactions from the past 24 hours."
 	timeStamp = 0
@@ -33,21 +34,23 @@ def sendRecent(to, allContent):
                 line = line.split('|')
                 pastTimeStamp = timeStamp
                 timeStamp = line[0]
+		
+		if compareTime(timeStamp, getTime()) == True:
 
-                if timeStamp != pastTimeStamp:
-                        lineOne = '-----%s-----\n' % timeStamp
-		else:
-			lineOne = '\n'
-                lineTwo = 'USER: \n%s\n' % line[1]
-                lineThree = 'TWEET: \n%s\n' % line[2]
-                lineFour = 'RESPONSE: \n%s\n' % line[3]
-
-		message = '%s\n%s%s%s%s' % (message, lineOne, lineTwo, lineThree, lineFour)
+	                if timeStamp != pastTimeStamp:
+	                        lineOne = '-----%s-----\n' % timeStamp
+			else:
+				lineOne = '\n'
+	                lineTwo = 'USER: \n%s\n' % line[1]
+	                lineThree = 'TWEET: \n%s\n' % line[2]
+	                lineFour = 'RESPONSE: \n%s\n' % line[3]
+	
+			message = '%s\n%s%s%s%s' % (message, lineOne, lineTwo, lineThree, lineFour)
 	
 	gmail.message(sender, password, to, subject, message)
 	
 def getTime():
-	now = datetime.datwtime.now()
+	now = datetime.datetime.now()
 	currentTime = now.strftime('%d.%m.%y %H:%M')
 	return currentTime
 
@@ -55,18 +58,18 @@ def compareTime(timestamp, currentTime):
 # Check if the timestamp from postHistory is from less than 24hrs ago
 	# Separate timestamp strings into more easily compared lists
 	stampList = timestamp.split(' ')
-	stampDate = stampList(0)
+	stampDate = stampList[0]
 	stampDate = stampDate.split('.')
 
 	currentList = currentTime.split(' ')
-	currentDate = currentList(0)
+	currentDate = currentList[0]
 	currentDate = currentDate.split('.')
 
-	if stampDate(2) == currentDate(2):
+	if stampDate[2] == currentDate[2]:
 	# The years match
-		if stampDate(1) == currentDate(1):
+		if stampDate[1] == currentDate[1]:
 		# The months match
-			if int(stampDate(0)) == str(currentDate(0)) -1:
+			if int(stampDate[0]) == int(currentDate[0]) -1:
 			# The day is yesterday
 				check = True
 			else:
@@ -78,4 +81,16 @@ def compareTime(timestamp, currentTime):
 	else:
 	# The years don't match
 		check = False
+
 	return check
+
+if __name__ == '__main__':
+
+        newFile = open('DATA/postHistory.log', 'r', 0)
+        history = newFile.read()
+        newFile.close()
+
+        history = history.split('\n')
+        history.pop()
+
+	sendRecent('xxx',history)
