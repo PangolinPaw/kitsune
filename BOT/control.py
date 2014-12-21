@@ -17,6 +17,7 @@ defaultSearch = ['TEST_SEARCH_TERM']
 defaultMessage = ['TEST_RESPONSE_MESSAGE']
 
 AUTORUN = False
+SENDHISTORY = False
 
 # ---------------------------------------------------------------
 # MENU
@@ -319,12 +320,22 @@ def matchPosts():
         return postDictionary
 
 
+def dailyHistory(to,content):
+        newFile = open(postHistory, 'r', 0)
+        history = newFile.read()
+        newFile.close()
+
+        history = history.split('\n')
+        history.pop()
+
+	print 'Daily history updates have not yet been implememnted.'
 
 # --------------------------------------------------------------------------
 if __name__ == '__main__':
 	# Autorun the bot once program starts
 	if AUTORUN == True:
 	        if os.path.exists(postHistory):
+			
 			os.system('sudo python %skitsune.py' % filepath)
 
 	# Start the main menu

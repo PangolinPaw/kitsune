@@ -33,7 +33,7 @@ def login(sender, password):
 
 def message(sender, password, to, subject, message):
 	# Send message (text only)
-	note = " (via GM's rPi emailApp)"
+	note = " (Powered by K.bot)"
 
 	SUBJECT = subject + note
 	TO = to
@@ -55,7 +55,7 @@ def message(sender, password, to, subject, message):
 
 def attach(sender, password, to, subject, message, filename):
 	# Create a text/plain message
-	note = " (via GM's rPi emailApp)"
+	note = " (Powered by K.bot)"
 
 	msg = email.mime.Multipart.MIMEMultipart()
 	msg['Subject'] = subject

@@ -3,8 +3,8 @@
 import gmail
 import datetime
 
-sender = 'xxx'
-password = 'xxx'
+sender = 'BOTkitsune@gmail.com'
+password = 'kitsune2211'
 
 def sendAll(to, content):
 	subject = 'KITSUNE: Full interaction history (manual request)'
