@@ -1,7 +1,8 @@
 kitsune
 =======
 
-Kitsune twitter response bot
+KITSUNE Twitter Interaction Bot
+===============================
 
 Introduction
 ------------------------
@@ -28,14 +29,12 @@ Possible Future Features
 Please Note
 ------------------------
 The kitsune bot relies on a Twitter API. On the first run of the program you will need to
-input all four keys.
+input all four keys from the API aassociated with your Twitter account. This can be set up
+on https://apps.twitter.com and is free of charge at the time of writing.
 
-Work in Progress
+Installation
 ------------------------
 The control.py script needs to be set to run on boot and the pi needs to automatically reboot
 every 24hrs (via cron). This will ensure software updates that require a reboot are 
 implemented after download without the need for human intervention.
 
-A 'First run' function placeholder needs to be included in the control.py script. This will
-allow for future versions to carry out specific tasks immediately after the script starts
-post reboot.
