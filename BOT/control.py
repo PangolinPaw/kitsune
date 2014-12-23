@@ -16,7 +16,7 @@ postHistory = '%sDATA/postHistory.log' % filepath
 defaultSearch = ['TEST_SEARCH_TERM']
 defaultMessage = ['TEST_RESPONSE_MESSAGE']
 
-AUTORUN = False
+AUTORUN = True
 SENDHISTORY = False
 
 # ---------------------------------------------------------------
@@ -73,9 +73,10 @@ def menu():
 		elif selection == '3':
 # View postHistory.log
 			history = viewHistory()
-			while True:
-				os.system('clear')
-				print """ 
+			if history != False:
+				while True:
+					os.system('clear')
+					print """ 
 ----------------------------------------
                 KITSUNE
              User Interface
@@ -85,23 +86,26 @@ def menu():
   Would you like an email copy?
  1 > Yes
  2 > No"""
-				selection = raw_input('\n   > ')
-				if selection == '1':
+					selection = raw_input('\n   > ')
+					if selection == '1':
 				# Email file
-#					try:
-					print "Please specify the recipient's email:"
-					to = raw_input(' > ')
-					sendHistory.sendAll(to, history)
-					print 'History has been sent successfully'
-					break
-#					except:
-#						print 'Error: Email failed to send.'
-				elif selection == '2':
-				# Return to menu
-					break
-				else:
-					print 'Invalid selection, please try again'
-					time.sleep(1)
+						try:
+							print "Please specify the recipient's email:"
+							to = raw_input(' > ')
+							sendHistory.sendAll(to, history)
+							print 'History has been sent successfully'
+							break
+						except:
+							print 'Error: Email failed to send.'
+					elif selection == '2':
+					# Return to menu
+						break
+					else:
+						print 'Invalid selection, please try again'
+						time.sleep(1)
+			else:
+			# No history file
+				print 'No postHistory file found.'
 			
 		elif selection == '4':
 # Update process
@@ -152,28 +156,32 @@ def menu():
 # FILE MANIPULATION
 
 def viewHistory():
-	timeStamp = 0
-	newFile = open(postHistory, 'r', 0)
-	history = newFile.read()
-	newFile.close()
+        if os.path.exists(postHistory):
 
-	history = history.split('\n')
-	history.pop()
-
-	print '%s post(s) recorded' %  len(history)
-	for line in history:
-		print
-		line = line.split('|')
-		pastTimeStamp = timeStamp
-		timeStamp = line[0]
-		if timeStamp != pastTimeStamp:
-			print '-----%s-----' % timeStamp
-		print 'USER: \n%s' % line[1]
-		print 'TWEET: \n%s' % line[2]
-		print 'RESPONSE: \n%s' % line[3]
-	input = raw_input('\nPress Enter to continue')
-
-	return history
+		timeStamp = 0
+		newFile = open(postHistory, 'r', 0)
+		history = newFile.read()
+		newFile.close()
+	
+		history = history.split('\n')
+		history.pop()
+	
+		print '%s post(s) recorded' %  len(history)
+		for line in history:
+			print
+			line = line.split('|')
+			pastTimeStamp = timeStamp
+			timeStamp = line[0]
+			if timeStamp != pastTimeStamp:
+				print '-----%s-----' % timeStamp
+			print 'USER: \n%s' % line[1]
+			print 'TWEET: \n%s' % line[2]
+			print 'RESPONSE: \n%s' % line[3]
+		input = raw_input('\nPress Enter to continue')
+	
+		return history
+	else:
+		return False
 
 def changeTerms():
 	postDictionary = matchPosts()
@@ -332,15 +340,17 @@ def dailyHistory(to,content):
 
 # --------------------------------------------------------------------------
 if __name__ == '__main__':
-	# Autorun the bot once program starts
-	if AUTORUN == True:
-	        if os.path.exists(postHistory):
-			
-			os.system('sudo python %skitsune.py' % filepath)
-
 	# Start the main menu
+	hasRun = False
 	while True:
 		try:
+		# Autorun the bot once program starts
+			if AUTORUN == True and hasRun == False:
+				hasRun = True
+			        if os.path.exists(postHistory):
+					os.system('sudo python %skitsune.py' % filepath)
+
+		# Then go to main menu
 			menu()
 		except KeyboardInterrupt:
 			print '\nRebooting menu, please wait...'
