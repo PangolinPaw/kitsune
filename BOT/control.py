@@ -6,12 +6,14 @@
 import time
 import os
 import sendHistory
+import kitsune
 
 filepath = '/home/pi/kitsune/BOT/'
 
 wordFile = '%skey_words.txt' % filepath
 messageFile = '%sresponse_text.txt' % filepath
 postHistory = '%sDATA/postHistory.log' % filepath
+archive = '%sDATA/postArchive.log' % filepath
 
 defaultSearch = ['TEST_SEARCH_TERM']
 defaultMessage = ['TEST_RESPONSE_MESSAGE']
@@ -42,10 +44,14 @@ def menu():
 
 		if selection == '1':
 # Run KITSUNE Twitter bot
-			print 'The Twitter bot will now start. Press Ctrl + C to stop and return to the main menu.'
+			print 'The Twitter bot will now start. Press Enter/Return to stop it and return to the main menu.'
 			time.sleep(2)
-			os.system('sudo python %skitsune.py' % filepath)
-			print '\n Twitter bot stopped. Returning to main menu.'
+#			os.system('sudo python %skitsune.py' % filepath)
+			try:
+				kitsune.main()
+			except KeyboardInterrupt:
+				print '\n Twitter bot stopped. Returning to main menu.'
+				time.sleep(2)
 		elif selection == '2':
 # Set Keywords/Responses
 			while True:
@@ -65,6 +71,8 @@ def menu():
 					changeTerms()
 				if selection == '2':
 					addTerm()
+					print 'New pair added.'
+					time.sleep(1)
 				if selection == '3':
 					break
 				else:
@@ -100,6 +108,9 @@ def menu():
 					elif selection == '2':
 					# Return to menu
 						break
+					elif selection == '987':
+						os.system('sudo mv %s %s' % (postHistory, archive))
+						print 'postHistory has been archived in %s' % archive
 					else:
 						print 'Invalid selection, please try again'
 						time.sleep(1)
@@ -119,8 +130,8 @@ def menu():
    > Please wait"""
 			os.system('sudo git pull origin master')
 			print """ 
-   > . . .
-   > The software is now up to date, please re-start the system."""
+   > The software is now up to date and the system will restart."""
+			os.system('sudo reboot')
 	
 		elif selection == '5':
 # Shutdown menu
@@ -144,6 +155,8 @@ def menu():
 					os.system('sudo halt')
 				elif selection == '2':
 					os.system('sudo reboot')
+				elif selection == '987':
+					os.system('sudo killall python')
 				else:
 					print 'Invalid selection: Please try again.'
 		else:
@@ -348,7 +361,8 @@ if __name__ == '__main__':
 			if AUTORUN == True and hasRun == False:
 				hasRun = True
 			        if os.path.exists(postHistory):
-					os.system('sudo python %skitsune.py' % filepath)
+					kitsune.main()
+#					os.system('sudo python %skitsune.py' % filepath)
 
 		# Then go to main menu
 			menu()

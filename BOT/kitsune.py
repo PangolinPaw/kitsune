@@ -10,6 +10,7 @@ import pickle					# To save and load API details
 import os					# To check for configuration files
 import string					# To filter out non-readable characters
 import datetime					# To add timestamps to post history logs
+import signal
 
 # If set to True, the program prints notificatons at each stage of the search/record/reply process:
 DEBUG = False
@@ -232,27 +233,58 @@ def clean(text):
 	return text
 
 # ---------------------------------------------------------------------------------------------
+# NON-BLOCKING RAW INPUT
+
+class AlarmException(Exception):
+	pass
+
+def alarmHandler(signum, frame):
+	raise AlarmException
+
+def nonBlockingInput(prompt='', timeout=20):
+	signal.signal(signal.SIGALRM, alarmHandler)
+	signal.alarm(timeout)
+	try:
+		text = raw_input(prompt)
+		signal.alarm(0)
+		return True
+	except AlarmException:
+		print '',
+	signal.signal(signal.SIGALRM, signal.SIG_IGN)
+	return ''
+
+
+# ---------------------------------------------------------------------------------------------
 # MAIN LOOP
 
 def main():
+# main loop
+	runBot = True
 	loopCount = 0
 	api = setup()	# Get access via API
-	while True:
+	while runBot == True:
 		os.system('clear')
 		print """ 
 -------------------------------------------
                  KITSUNE
         Twitter Interaction Bot
 -------------------------------------------
- Press Ctrl + C to return to the Main Menu
+  Press Enter to return to the Main Menu
 -------------------------------------------
-Interval: %smin            Auto Halt: %s
-===========================================""" % (interval, SHUTDOWN)
+Scan interval: %smin          Scan No.: %s
+===========================================
+ """ % (interval, loopCount)
 
 		postDictionary = matchPosts()	# Associate keywords with responses
 		search(api, postDictionary)	# Search twitter for keywords & post responses
 		if DEBUG: print 'D: Sleeping for %s min' % interval
-		time.sleep(interval * 60)
+
+		# Delay loop for specified interval & check for keyboard interupt
+		waitCount = interval * 60
+		for x in range(0, waitCount):
+			if nonBlockingInput('', 1): 
+				runBot = False
+				break
 
 		loopCount = loopCount +1
 		if loopCount > LIMIT:
