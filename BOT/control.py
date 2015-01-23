@@ -2,7 +2,7 @@
 
 # User interface and updater for KITSUNE
 # --------------------------------------
-# v1.1
+# v1.2
 # --------------------------------------
 
 import time
