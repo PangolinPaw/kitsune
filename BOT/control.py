@@ -8,7 +8,7 @@ import os
 import sendHistory
 import kitsune
 
-version = 1.2
+version = 1.3
 
 filepath = '/home/pi/kitsune/BOT/'
 
@@ -136,10 +136,11 @@ def menu():
    > Please wait""" % version
 			os.system('sudo git pull origin master')
 			print """ 
-   > The software is now up to date and the system will restart."""
+   > The software is now up to date. Returning to main menu."""
 			time.sleep(2)
+# If restart is necessary, uncomment following line:
 #			os.system('sudo reboot')
-
+# Possible to show change log or update notes here in future versions
 
 		elif selection == '5':
 # Change API details
