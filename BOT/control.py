@@ -2,6 +2,8 @@
 
 # User interface and updater for KITSUNE
 # --------------------------------------
+# v1.1
+# --------------------------------------
 
 import time
 import os
@@ -14,8 +16,7 @@ wordFile = '%skey_words.txt' % filepath
 messageFile = '%sresponse_text.txt' % filepath
 postHistory = '%sDATA/postHistory.log' % filepath
 archive = '%sDATA/postArchive.log' % filepath
-#APIfile = '%sDATA/API.dat' % filepath
-APIfile = '%sDATA/dummy.dat' % filepath
+APIfile = '%sDATA/API.dat' % filepath
 
 defaultSearch = ['TEST_SEARCH_TERM']
 defaultMessage = ['TEST_RESPONSE_MESSAGE']
@@ -137,7 +138,7 @@ def menu():
 			print """ 
    > The software is now up to date and the system will restart."""
 			time.sleep(2)
-			os.system('sudo reboot')
+#			os.system('sudo reboot')
 
 
 		elif selection == '5':
