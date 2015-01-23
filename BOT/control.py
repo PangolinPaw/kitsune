@@ -2,13 +2,13 @@
 
 # User interface and updater for KITSUNE
 # --------------------------------------
-# v1.2
-# --------------------------------------
 
 import time
 import os
 import sendHistory
 import kitsune
+
+version = 1.2
 
 filepath = '/home/pi/kitsune/BOT/'
 
@@ -32,7 +32,7 @@ def menu():
 		os.system('clear')
 		print """ 
 ----------------------------------------
-                KITSUNE
+                KITSUNE		    v%s
              User Interface
 ----------------------------------------
 ========================================
@@ -45,7 +45,7 @@ def menu():
  4 > Check for Updates
  5 > Change API details
 
- 6 > Shutdown"""
+ 6 > Shutdown""" % version
 
 		selection = raw_input('\n   > ')
 
@@ -64,14 +64,14 @@ def menu():
 				os.system('clear')
 				print """ 
 ----------------------------------------
-                KITSUNE
+                KITSUNE		    v%s
              User Interface
 ----------------------------------------
 ========================================
      SEARCH SETTINGS
  1 > Review search term/response pairs
  2 > Add new pair
- 3 > Return to main menu"""
+ 3 > Return to main menu""" % version
 				selection = raw_input('\n   > ')
 				if selection == '1':
 					changeTerms()
@@ -92,14 +92,14 @@ def menu():
 					os.system('clear')
 					print """ 
 ----------------------------------------
-                KITSUNE
+                KITSUNE		    v%s
              User Interface
 ----------------------------------------
 ========================================
      INTERACTION HISTORY
   Would you like an email copy?
  1 > Yes
- 2 > No"""
+ 2 > No""" % version
 					selection = raw_input('\n   > ')
 					if selection == '1':
 				# Email file
@@ -128,12 +128,12 @@ def menu():
 # Update process
 			print """
 ----------------------------------------
-                KITSUNE
+                KITSUNE		    v%s
              User Interface
 ----------------------------------------
 ========================================
      UPDATING
-   > Please wait"""
+   > Please wait""" % version
 			os.system('sudo git pull origin master')
 			print """ 
    > The software is now up to date and the system will restart."""
@@ -148,13 +148,13 @@ def menu():
 
 				print """ 
 ----------------------------------------
-                KITSUNE
+                KITSUNE		    v%s
              User Interface
 ----------------------------------------
 ========================================
      API DETAILS
  0 > Go Back
- 1 > Clear data"""
+ 1 > Clear data""" % version
 				selection = raw_input('\n  > ')
 				if selection == '0':
 					print 'Returning to main menu'
@@ -196,14 +196,14 @@ def menu():
 	
 				print """
 ----------------------------------------
-                KITSUNE
+                KITSUNE		    v%s
              User Interface
 ----------------------------------------
 ========================================
      SHUTDOWN MENU
  0 > Go Back
  1 > Shutdown
- 2 > Restart"""
+ 2 > Restart""" % version
 				selection = raw_input('\n   > ')
 				if selection == '0':
 					break
