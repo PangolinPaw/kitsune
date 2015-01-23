@@ -126,6 +126,7 @@ def menu():
 			
 		elif selection == '4':
 # Update process
+			os.system('clear')
 			print """
 ----------------------------------------
                 KITSUNE		    v%s
