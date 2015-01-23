@@ -14,6 +14,8 @@ wordFile = '%skey_words.txt' % filepath
 messageFile = '%sresponse_text.txt' % filepath
 postHistory = '%sDATA/postHistory.log' % filepath
 archive = '%sDATA/postArchive.log' % filepath
+#APIfile = '%sDATA/API.dat' % filepath
+APIfile = '%sDATA/dummy.dat' % filepath
 
 defaultSearch = ['TEST_SEARCH_TERM']
 defaultMessage = ['TEST_RESPONSE_MESSAGE']
@@ -35,10 +37,14 @@ def menu():
 ========================================
      MAIN MENU
  1 > Start Twitter Bot
+
  2 > Search Terms and Responses
  3 > View Interaction History
+
  4 > Check for Updates
- 5 > Shutdown"""
+ 5 > Change API details
+
+ 6 > Shutdown"""
 
 		selection = raw_input('\n   > ')
 
@@ -46,7 +52,6 @@ def menu():
 # Run KITSUNE Twitter bot
 			print 'The Twitter bot will now start. Press Enter/Return to stop it and return to the main menu.'
 			time.sleep(2)
-#			os.system('sudo python %skitsune.py' % filepath)
 			try:
 				kitsune.main()
 			except KeyboardInterrupt:
@@ -131,9 +136,59 @@ def menu():
 			os.system('sudo git pull origin master')
 			print """ 
    > The software is now up to date and the system will restart."""
+			time.sleep(2)
 			os.system('sudo reboot')
-	
+
+
 		elif selection == '5':
+# Change API details
+			while True:
+				os.system('clear')
+
+				print """ 
+----------------------------------------
+                KITSUNE
+             User Interface
+----------------------------------------
+========================================
+     API DETAILS
+ 0 > Go Back
+ 1 > Clear data"""
+				selection = raw_input('\n  > ')
+				if selection == '0':
+					print 'Returning to main menu'
+					break
+				elif selection == '1':
+					print "\nThis will permanently clear current API details so Kitsune will not be able to interact with Twitter."
+					print "To add new details, run the bot from the main menu and enter all four keys when prompted."
+					while True:
+						print '\nAre you sure you want to clear the current API details?'
+						print """ 
+ 2 > Yes
+ 3 > No"""
+						selection = raw_input('\n  > ')	
+						if selection == '2':
+						        if os.path.exists(APIfile):
+								os.system('sudo rm %s' % APIfile)
+								print 'API keys deleted. Run the bot from the main menu to input new keys.'
+							else:
+								print 'No API details are saved. Run the bot from the main menu to input new keys.'
+							selection = raw_input('Press Enter to continue')
+							break
+						elif selection == '3':
+							print 'API details unchanged.'
+							selection = raw_input('Press Enter to continue')
+							break
+						else:
+							print 'Invalid selection, please try again.'
+						time.sleep(1)
+
+				else:
+					print 'Invalid selection: please try again.'
+				time.sleep(2)
+
+
+		elif selection == '6':
 # Shutdown menu
 			while True:
 				os.system('clear')
