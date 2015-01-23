@@ -136,10 +136,10 @@ def menu():
    > Please wait""" % version
 			os.system('sudo git pull origin master')
 			print """ 
-   > The software is now up to date. Returning to main menu."""
+   > The software is now up to date and the system will restart so changes can take effect."""
 			time.sleep(2)
-# If restart is necessary, uncomment following line:
-#			os.system('sudo reboot')
+			# Restart necessary for changes to take effect
+			os.system('sudo reboot')
 # Possible to show change log or update notes here in future versions
 
 		elif selection == '5':
