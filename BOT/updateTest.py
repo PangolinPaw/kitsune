@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # Test programatically pulling updates from GitHub & self-overwriting
-# This is version 1
+# This is version 2
 
 import os
 
