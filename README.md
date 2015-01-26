@@ -38,3 +38,4 @@ The control.py script needs to be set to run on boot and the pi needs to automat
 every 24hrs (via cron). This will ensure software updates that require a reboot are 
 implemented after download without the need for human intervention.
 
+Please note that this was designed for a specific use, on a specific SD card and hasn't yet been made flexible enough for distribution to other Raspberry Pis. In particular, the self-updates relies on the scrips being saved in a specific directory that is set up as a local Git repository.
