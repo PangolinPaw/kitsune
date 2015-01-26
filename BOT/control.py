@@ -7,8 +7,17 @@ import time
 import os
 import sendHistory
 import kitsune
+import advert
 
-version = 1.3
+# Version tracking & clangelog for update screen
+version = 1.4
+latest = """ 
+Version %s (latest update):
+ - Improved version tracking.
+ - Self promotion adverts enabled (see EULA: Fees and Marketing).
+ Version %s:
+  - Update menu improvements.
+  - Option to overwrite API details.""" % (version, (version - 0.1))
 
 filepath = '/home/pi/kitsune/BOT/'
 
@@ -133,8 +142,10 @@ def menu():
              User Interface
 ----------------------------------------
 ========================================
+%s
+----------------------------------------
      UPDATING
-   > Please wait""" % version
+   > Please wait""" % (version, latest)
 			os.system('sudo git pull origin master')
 			print """ 
    > The software is now up to date and the system will restart so changes can take effect."""
@@ -411,6 +422,8 @@ def dailyHistory(to,content):
 
 # --------------------------------------------------------------------------
 if __name__ == '__main__':
+	# Send self-promoting Tweet according to predefined schedule
+	advert.main()
 	# Start the main menu
 	hasRun = False
 	while True:
