@@ -8,16 +8,19 @@ import os
 import sendHistory
 import kitsune
 import advert
+import validate
 
 # Version tracking & clangelog for update screen
-version = 1.4
+version = 1.5
 latest = """ 
 Version %s (latest update):
- - Improved version tracking.
- - Self promotion adverts enabled (see EULA: Fees and Marketing).
- Version %s:
-  - Update menu improvements.
-  - Option to overwrite API details.""" % (version, (version - 0.1))
+  - Feature control functions added to Update menu.
+  - Version validation checks enabled.
+  - Auto-update core functionality on each run.
+Version %s:
+  - Added option to overwrite API details.
+  - Improved version tracking.
+  - Self promotion adverts enabled (see EULA: Fees and Marketing).""" % (version, (version - 0.1))
 
 filepath = '/home/pi/kitsune/BOT/'
 
@@ -142,17 +145,21 @@ def menu():
              User Interface
 ----------------------------------------
 ========================================
-%s
-----------------------------------------
      UPDATING
-   > Please wait""" % (version, latest)
-			os.system('sudo git pull origin master')
-			print """ 
+   > 
+%s""" % (version, latest)
+   			output = validate.validate()
+   			if output[0] == True: # Update Key OK
+				os.system('sudo git pull origin %s' % output[1]) # Download branch specified by Update Key
+
+				print """ 
    > The software is now up to date and the system will restart so changes can take effect."""
-			time.sleep(2)
-			# Restart necessary for changes to take effect
-			os.system('sudo reboot')
-# Possible to show change log or update notes here in future versions
+				time.sleep(2)
+				# Restart necessary for changes to take effect
+				os.system('sudo reboot')
+			else: # Invalid Update Key
+				print """ 
+   > The software update was not successful, please try again."""				
 
 		elif selection == '5':
 # Change API details
@@ -424,6 +431,8 @@ def dailyHistory(to,content):
 if __name__ == '__main__':
 	# Send self-promoting Tweet according to predefined schedule
 	advert.main()
+	# Update core functionality ready for next boot
+	os.system('sudo git pull origin master')
 	# Start the main menu
 	hasRun = False
 	while True:
@@ -433,9 +442,9 @@ if __name__ == '__main__':
 				hasRun = True
 			        if os.path.exists(postHistory):
 					kitsune.main()
-#					os.system('sudo python %skitsune.py' % filepath)
 
-		# Then go to main menu
+
+		# Then go to main menu if Ctrl+C pressed
 			menu()
 		except KeyboardInterrupt:
 			print '\nRebooting menu, please wait...'
