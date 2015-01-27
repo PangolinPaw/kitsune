@@ -88,8 +88,9 @@ def validate():
 	print """ 
 Your software needs to be authenticated before installing the latest features. 
 If you do not have an Update Key, please press Ctrl+C to go back to the main menu and email botKITSUNE@gmail.com
-Product ID: %s""" % ID
-	key = raw_input('Update key: ') # Should be in the format '0000-branch_name' where 0000 is a hexadecimal number
+
+ > Product ID: %s""" % ID
+	key = raw_input(' > Update key: ') # Should be in the format '0000-branch_name' where 0000 is a hexadecimal number
 
 	# Carry out calculation using the Update Key & serial number to check if installation is valid
 	try:

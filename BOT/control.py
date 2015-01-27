@@ -145,8 +145,7 @@ def menu():
              User Interface
 ----------------------------------------
 ========================================
-     UPDATING
-   > 
+     UPDATES AND UPGRADES
 %s""" % (version, latest)
    			output = validate.validate()
    			if output[0] == True: # Update Key OK
