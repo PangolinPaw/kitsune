@@ -12,7 +12,7 @@ import datetime			# To add timestamps to post history logs
 
 
 # Bot will only post to twitter if this is set to True:
-POST = False
+POST = True
 
 # How many months (minumum) between advert posts?
 rate = 3
