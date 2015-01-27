@@ -2,8 +2,9 @@
 
 # UPDATE VALIDATION
 # Forces user to request permission from botKITSUNE@gmail.com before an update is applied.
-# This is only effective if the software is supplied on a pre-imaged SD card that doesn't allow read access to any files. This allows for different versions
-# of KITSUNE (with different features) to be made available.
+# This is only effective if the software is supplied on a pre-imaged SD card that doesn't allow read access to any files. 
+# This allows for different versions of KITSUNE (with different features) to be made available.
+# Different feature-sets are stored as different branches of the GitHub repo, each branch is selected using the Update key entered.
 
 import pickle
 import os
@@ -80,18 +81,7 @@ def readID():
 	ID = IDdata[-1] # Serial number is always last item in the list
 	return float(ID)
 
-def validate(key):
-	# Carry out calculation using the Update Key & serial number to check if installation is valid
-	day = datetime.now().timetuple().tm_yday # Day of the year (keys only valid for one day)
-	ID = readID()
-	result = ((ID/22) +9)*day
-	if key == int(result):
-		return True
-	else:
-		return False
-
-
-def main():
+def validate():
 	# Bring the process above together in the corect order, take input from user & check validity
 	createID() # Check ID has been created (& do so if it hasn't)
 	ID = readID() # Fetch product ID
@@ -99,21 +89,31 @@ def main():
 Your software needs to be authenticated before installing the latest features. 
 If you do not have an Update Key, please press Ctrl+C to go back to the main menu and email botKITSUNE@gmail.com
 Product ID: %s""" % ID
-	key = raw_input('Update key: ')
-	key = int(key, 16) # Convert key (hexadecimal number) to integer
+	key = raw_input('Update key: ') # Should be in the format '0000-branch_name' where 0000 is a hexadecimal number
 
-	if validate(key) == True:
-		# Valid key, continue with update
-		return True
-	else:
-		# Invalid key, prevent update
+	# Carry out calculation using the Update Key & serial number to check if installation is valid
+	try:
+		key = key.split('-')
+		keyBranch = key[1]
+		keyNum = key[0]
+		keyNum = int(keyNum, 16) # Convert key (hexadecimal number) to integer
+
+		day = datetime.now().timetuple().tm_yday # Day of the year (keys only valid for one day)
+		ID = readID()
+		result = ((ID/22) +9)*day
+		if keyNum == int(result):
+			valid = True
+		else:
+			print "That Update Key is either invalid or has expired. Please ensure it was entered correctly or email botKITSUNE@gmail.com for assistance."
+			valid = False
+	except:
 		print "That Update Key is either invalid or has expired. Please ensure it was entered correctly or email botKITSUNE@gmail.com for assistance."
-		return False
+		valid = False
+		keyBranch = 'None'
+
+	return [valid, keyBranch] 
+	# Control.py takes this output & if 'valid == True' carry out 'git pull origin keyBranch'
+
 
 if __name__ == '__main__':
-	if main() == True:
-		print 'VALID'
-	else:
-		print 'INVALID'
-
-
+	validate()
