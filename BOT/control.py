@@ -155,7 +155,7 @@ def menu():
    > The software is now up to date and the system will restart so changes can take effect."""
 				time.sleep(2)
 				# Restart necessary for changes to take effect
-				os.system('sudo reboot')
+#				os.system('sudo reboot')
 			else: # Invalid Update Key
 				print """ 
    > The software update was not successful, please try again."""				
