@@ -12,7 +12,7 @@ import datetime			# To add timestamps to post history logs
 
 
 # Bot will only post to twitter if this is set to True:
-POST = True
+POST = False
 
 # How many months (minumum) between advert posts?
 rate = 3
@@ -64,6 +64,7 @@ def record():
 		pass
 
 def lastPost():
+	global rate
 	postTime = 0
 	if os.path.exists(postHistory):
     		# Read all post history
@@ -77,21 +78,21 @@ def lastPost():
         	    logEntry = line.split('|')
         	    if 'KITSUNE' in logEntry:
         	        # KITSUNE entry found, save the timestamp
-        	        postTime = logEntry(0)
+        	        postTime = logEntry[0]
     
 	if postTime != 0:
     		# Get current month in number format
     		currentTime = timestamp()
     		currentTime = currentTime.split(" ")
-    		currentDate = currentTime(0)
+    		currentDate = currentTime[0]
     		currentDate = currentDate.split(".")
-    		currentMonth = int(currentDate(1))
+    		currentMonth = int(currentDate[1])
 
     		# Extract month of post in number format
     		postTime = postTime.split(" ")
-    		postDate = postTime(0)
+    		postDate = postTime[0]
     		postDate = postDate.split(".")
-    		postMonth = int(postDate(1))
+    		postMonth = int(postDate[1])
 
 	    	if postMonth == 12:
 	    		postMonth = 1 # To cope with end of year
