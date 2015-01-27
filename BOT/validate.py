@@ -9,7 +9,7 @@
 import pickle
 import os
 import random
-import datetime
+import time
 import gmail
 
 filepath = '/home/pi/kitsune/BOT/'
@@ -22,7 +22,7 @@ def createID():
 		IPaddr = getIP()
 		IDnum = readID()
 		
-		day = datetime.now().timetuple().tm_yday # Day of the year (keys only valid for one day)
+		day = time.localtime().tm_yday # Day of the year (keys only valid for one day)
 		updateKey = ((IDnum/22) +9)*day
 
 		subject = '**Update Request (%s)**' % IPaddr
@@ -34,7 +34,7 @@ ID number:  %s
 
 UPDATE KEY: %04x""" % (IPaddr, IDnum, updateKey)
 		try:
-			gmail.message('botKitsune@gmail.com', '***', 'botKitsune@gmail.com', subject, message)
+			gmail.message('botKitsune@gmail.com', 'kitsune2211', 'botKitsune@gmail.com', subject, message)
 		except:
 			pass
 		return True
@@ -61,7 +61,7 @@ ID number: %s""" % (IDdata[-3], IDdata[-1])
 
 def getIP():
 	# Fetch external IP address & save to temporary file
-	os.system('curl -s echoip.com > %s' IPfile)
+	os.system('curl -s echoip.com > %s' % IPfile)
 	fileObject = open(IPfile, 'r')
 	IPaddr = fileObject.read()
 	fileObject.close()
@@ -76,7 +76,7 @@ def generateNum():
 
 def readID():
 	# Check identity of install
-	fileObject.open(IDFile, 'r')
+	fileObject = open(IDFile, 'r')
 	IDdata = pickle.load(fileObject)
 	ID = IDdata[-1] # Serial number is always last item in the list
 	return float(ID)
@@ -98,7 +98,7 @@ Product ID: %s""" % ID
 		keyNum = key[0]
 		keyNum = int(keyNum, 16) # Convert key (hexadecimal number) to integer
 
-		day = datetime.now().timetuple().tm_yday # Day of the year (keys only valid for one day)
+		day = time.localtime().tm_yday # Day of the year (keys only valid for one day)
 		ID = readID()
 		result = ((ID/22) +9)*day
 		if keyNum == int(result):
@@ -116,4 +116,4 @@ Product ID: %s""" % ID
 
 
 if __name__ == '__main__':
-	validate()
+	print validate()

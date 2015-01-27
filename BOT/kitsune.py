@@ -218,8 +218,8 @@ def search(api, postDictionary):
 					print 'Ignored a tweet from %s' % user
 
 		except TwythonError as e:
-			print 'Search error:\n%s' % e
-
+			print 'Search error:\n%s\n API details may be incorrect, please re-enter from the main menu.' % e
+			os.system('sudo rm %s' % keyFile)
 		print '-------------------------------------------\n'
 
 # --------------------------------------------------------------------------------------------
