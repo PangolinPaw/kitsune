@@ -35,6 +35,7 @@ defaultMessage = ['TEST_RESPONSE_MESSAGE']
 
 AUTORUN = True
 SENDHISTORY = False
+AUTO_UPDATE = False
 
 # ---------------------------------------------------------------
 # MENU
@@ -120,6 +121,7 @@ def menu():
 							to = raw_input(' > ')
 							sendHistory.sendAll(to, history)
 							print 'History has been sent successfully'
+							time.sleep(2)
 							break
 						except:
 							print 'Error: Email failed to send.'
@@ -431,7 +433,7 @@ if __name__ == '__main__':
 	# Send self-promoting Tweet according to predefined schedule
 	advert.main()
 	# Update core functionality ready for next boot
-	os.system('sudo git pull origin master')
+	if AUTO_UPDATE: os.system('sudo git pull origin master')
 	# Start the main menu
 	hasRun = False
 	while True:
