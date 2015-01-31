@@ -4,7 +4,7 @@ import gmail
 import datetime
 
 sender = 'BOTkitsune@gmail.com'
-password = '***'
+password = 'kitsune2211'
 
 def sendAll(to, content):
 	subject = 'KITSUNE: Full interaction history (manual request)'
