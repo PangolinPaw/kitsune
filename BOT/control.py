@@ -11,16 +11,22 @@ import advert
 import validate
 
 # Version tracking & clangelog for update screen
-version = 1.5
+version = 1.6
 latest = """ 
 Version %s (latest update):
+  - Added Follow function, bot will now follow all individuals it replies to.
+  - Added Follow and Post controls so replies and auto-following can be switched on or off.
+  - Re-ordered main menu to incorporate new controls.
+
+Version %s:
   - Feature control functions added to Update menu.
   - Version validation checks enabled.
   - Auto-update core functionality on each run.
-Version %s:
+
+Version %s
   - Added option to overwrite API details.
   - Improved version tracking.
-  - Self promotion adverts enabled (see EULA: Fees and Marketing).""" % (version, (version - 0.1))
+  - Self promotion adverts enabled (see EULA: Fees and Marketing).""" % (version, (version - 0.1), (version - 0.2))
 
 filepath = '/home/pi/kitsune/BOT/'
 
@@ -50,8 +56,9 @@ def menu():
 ----------------------------------------
 ========================================
      MAIN MENU
- 1 > Start Twitter Bot
+ 0 > Start Twitter Bot
 
+ 1 > Follow & Post controls
  2 > Search Terms and Responses
  3 > View Interaction History
 
@@ -62,7 +69,7 @@ def menu():
 
 		selection = raw_input('\n   > ')
 
-		if selection == '1':
+		if selection == '0':
 # Run KITSUNE Twitter bot
 			print 'The Twitter bot will now start. Press Enter/Return to stop it and return to the main menu.'
 			time.sleep(2)
@@ -71,6 +78,55 @@ def menu():
 			except KeyboardInterrupt:
 				print '\n Twitter bot stopped. Returning to main menu.'
 				time.sleep(2)
+
+		elif selection == '1':
+# Change POST & FOLLOW settings
+			while True:
+				currentSettings = kitsune.postSetting(['READ', '0', '0'])
+				followOK = currenSettings[1]
+				postOK = currentSettings[2]
+				print """ 
+----------------------------------------
+                KITSUNE		    v%s
+             User Interface
+----------------------------------------
+========================================
+     INTERACTION SETTINGS
+
+ Current Settings:
+   - Follow users = %s
+   - Post replies = %s
+
+ 1 > Toggle Following
+ 2 > Toggle Posting
+ 3 > Return to main menu""" % (version, followOK, postOK)
+				selection = raw_input('\n   > ')
+				if selection == '1':
+					# Swap the value of followOK to it's opposite
+					if followOK == True:
+						followOK = False
+					else:
+						followOK = True
+
+					# Save changes
+					kitsune.postSettings(['WRITE', followOK, postOK])
+					time.sleep(0.5)
+
+				if selection == '2':
+					# Swap the value of postOK to it's opposite
+					if postOK == True:
+						postOK = False
+					else
+						postOK = True
+
+					# Save changes
+					kitsune.postSettings(['WRITE', followOK, postOK])
+					time.sleep(0.5)
+				if selection == '3':
+					break
+				else:
+					print 'Invalid selection, please try again'			
+
 		elif selection == '2':
 # Set Keywords/Responses
 			while True:
