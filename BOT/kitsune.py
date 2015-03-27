@@ -363,8 +363,9 @@ def main():
   Press Enter to return to the Main Menu
 -------------------------------------------
 Scan interval: %smin          Scan No.: %s
+Follow users = %s    Post replies = %s
 ===========================================
- """ % (interval, loopCount)
+ """ % (interval, loopCount, FOLLOW, POST)
 
 		postDictionary = matchPosts()	# Associate keywords with responses
 		search(api, postDictionary)	# Search twitter for keywords & post responses
