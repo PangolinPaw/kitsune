@@ -15,8 +15,11 @@ import signal
 # If set to True, the program prints notificatons at each stage of the search/record/reply process:
 DEBUG = False
 DEBUG2 = False
+
 # Bot will only post to twitter if this is set to True:
 POST = True
+# Bot will follow users if this is True
+FOLLOW = True
 
 SHUTDOWN = False# If true, Pi will shut down after...
 LIMIT = 95	# ...this many search/response loops
@@ -31,6 +34,7 @@ keyFile = '%sDATA/API.dat' % filepath
 wordFile = '%skey_words.txt' % filepath
 messageFile = '%sresponse_text.txt' % filepath
 postHistory = '%sDATA/postHistory.log' % filepath
+actionFile = '%saction.dat' % filepath	# Defines whethe the bot should reply or just follow matched Tweets
 
 # If conficuration files have not been set up, the program uses the following search terms & replies:
 defaultSearch = ['testphrase01']
@@ -203,13 +207,25 @@ def search(api, postDictionary):
 				text = tweet['text']
 				text = clean(text)
 				user = tweet['user']['screen_name']
-				reply = '@%s %s' % (user, message)
+				if POST:
+					# Record our response if posting is permitted
+					reply = '@%s %s' % (user, message)
+				elif FOLLOW:
+					# Record that we're now following if no message was posted
+					reply = '@%s %s' % (user, '- Followed but did not reply')
+				else:
+					# Neither posting or following is switched on, the reply below will be ignored
+					reply = '@%s %s' % (user, message)
 				
 				if record(user, text, reply) == True:
 					print 'TWEET FOUND:\n%s\n%s' % (user, text)
 					try:
 						if POST: api.update_status(status=reply, in_reply_to_status_id=tweet['id_str'])
-						print 'REPLY SENT:\n%s' % reply
+							print 'REPLY SENT:\n%s' % reply
+						if FOLLOW:
+						# Follow the poster of the Tweet
+							api.createFriendship(user_id=tweet['user']['id'])
+							print'NOW FOLLOWING @%s' % user
 
 					except TwythonError as e:
 						print 'Send error:\n%s' % e
@@ -253,6 +269,73 @@ def nonBlockingInput(prompt='', timeout=20):
 	signal.signal(signal.SIGALRM, signal.SIG_IGN)
 	return ''
 
+# ---------------------------------------------------------------------------------------------
+# CHECK POST/FOLLOW SETTINGS
+
+def postSetting(action):
+	# Interacts with the actionFile to determine or change whetrher KITSUNE should follow, reply to or both when 
+	# it encounters an applicable Tweet. The action File contains a dictionary with the following structure:
+
+	# Key 		Item
+	# FOLLOW 	True/False
+	# POST 		True/False 
+
+	# Expects the argument:
+	# [action (READ/WRITE), follow users (T/F), reply to tweets (T/F)]
+	# (If action is READ, the subsequent arguments are ignored)
+
+	# Returns the following:
+	# [vaid 'action' argument (T/F), follow users (T/F), reply to tweets (T/F)]
+
+	if action[0].upper() == 'WRITE':
+		# Change current settings
+		check = True
+
+		save_data = {'FOLLOW':action[1],'POST':action[2]}
+		save_file = open(actionFile,'wb')
+		pickle.dump(save_data,save_file)
+		save_file.close()
+
+		followOK = save_data('FOLLOW')
+		postOK = save_data('POST')
+
+		output = [check, followOK, postOK]
+
+	if action[0].upper() == 'READ':
+		# Read & return current settings
+		check = True
+		
+		if os.path.exists(actionFile):
+			# Load from file
+			load_file = open(actionFile,'rb')
+			load_data = pickle.load(load_file)
+			load_file.close()	
+
+			# Return current settings
+			followOK = load_data['FOLLOW']
+			postOK = load.data['POST']
+
+		else:
+			# File has not been created, make it now with default values
+			save_data = {'FOLLOW':True,'POST':True}
+			save_file = open(actionFile,'wb')
+			pickle.dump(save_data,save_file)
+			save_file.close()
+
+			followOK = save_data('FOLLOW')
+			postOK = save_data('POST')			
+
+		output = [check, followOK, postOK]
+
+	else:
+		# Invalid argument provided
+		check = False
+		followOK = False
+		postOK = False
+		output = [check, followOK, postOK]
+
+	return output
+
 
 # ---------------------------------------------------------------------------------------------
 # MAIN LOOP
@@ -262,6 +345,14 @@ def main():
 	runBot = True
 	loopCount = 0
 	api = setup()	# Get access via API
+
+	# Check settings file to see if KITSUNE should post replies or just follow after finding applicable tweets
+	currentSettings = postSettings(['READ', '0', '0'])
+	global FOLLOW
+	global POST
+	FOLLOW = currentSettings[1]
+	POST = currentSettings[2]
+
 	while runBot == True:
 		os.system('clear')
 		print """ 
