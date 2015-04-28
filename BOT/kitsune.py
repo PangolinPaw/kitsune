@@ -18,7 +18,7 @@ DEBUG2 = False
 
 # Bot will only post to twitter if this is set to True:
 POST = True
-# Bot will follow users if this is True
+# Bot will follow users if this is True (TEMPORARY AMENDMENT: All FOLLOW actions have been replaced with marking a Tweet as a Favourite)
 FOLLOW = True
 
 SHUTDOWN = False# If true, Pi will shut down after...
@@ -212,7 +212,8 @@ def search(api, postDictionary):
 					reply = '@%s %s' % (user, message)
 				elif FOLLOW:
 					# Record that we're now following if no message was posted
-					reply = '@%s %s' % (user, '- Followed but did not reply')
+					#reply = '@%s %s' % (user, '- Followed but did not reply')
+					reply = '@%s %s' % (user, '- Marked as favourite but did not reply')
 				else:
 					# Neither posting or following is switched on, the reply below will be ignored
 					reply = '@%s %s' % (user, message)
@@ -224,8 +225,11 @@ def search(api, postDictionary):
 							print 'REPLY SENT:\n%s' % reply
 						if FOLLOW:
 						# Follow the poster of the Tweet
-							api.createFriendship(user_id=tweet['user']['id'])
-							print'NOW FOLLOWING @%s' % user
+							#api.createFriendship(user_id=tweet['user']['id'])
+							#print'NOW FOLLOWING @%s' % user
+						# Favourite the Tweet:
+							api.create_favorite(id=tweet['id_str'])
+							print 'FAVOURITED A TWEET BY %s' % user
 
 					except TwythonError as e:
 						print 'Send error:\n%s' % e
