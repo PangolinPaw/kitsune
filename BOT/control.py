@@ -11,11 +11,11 @@ import advert
 import validate
 
 # Version tracking & clangelog for update screen
-version = 1.6
+version = 1.7
 latest = """ 
 Version %s (latest update):
-  - Added Follow function, bot will now follow all individuals it replies to.
-  - Added Follow and Post controls so replies and auto-following can be switched on or off.
+  - Added Favourite function, bot will now favourite Tweets matching it's search terms.
+  - Added Favourite and Post controls so replies and auto-favourite can be switched on or off.
   - Re-ordered main menu to incorporate new controls.
 
 Version %s:
@@ -58,7 +58,7 @@ def menu():
      MAIN MENU
  0 > Start Twitter Bot
 
- 1 > Follow & Post controls
+ 1 > Favourite & Post controls
  2 > Search Terms and Responses
  3 > View Interaction History
 
@@ -94,10 +94,10 @@ def menu():
      INTERACTION SETTINGS
 
  Current Settings:
-   - Follow users = %s
+   - Favourite Tweets = %s
    - Post replies = %s
 
- 1 > Toggle Following
+ 1 > Toggle Favouriteing
  2 > Toggle Posting
  3 > Return to main menu""" % (version, followOK, postOK)
 				selection = raw_input('\n   > ')
