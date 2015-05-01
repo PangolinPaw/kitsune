@@ -1,84 +1,80 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset="UTF-8">
     <title>Kitsune by PangolinPaw</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Kitsune</h1>
-        <p>Kitsune twitter response bot</p>
-        <p class="view"><a href="https://github.com/PangolinPaw/kitsune">View the Project on GitHub <small>PangolinPaw/kitsune</small></a></p>
-        <ul>
-          <li><a href="https://github.com/PangolinPaw/kitsune/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/PangolinPaw/kitsune/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/PangolinPaw/kitsune">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h2>
-<a id="kitsune-twitter-interaction-bot" class="anchor" href="#kitsune-twitter-interaction-bot" aria-hidden="true"><span class="octicon octicon-link"></span></a>KITSUNE Twitter Interaction Bot</h2>
+    <section class="page-header">
+      <h1 class="project-name">Kitsune</h1>
+      <h2 class="project-tagline">Kitsune twitter response bot</h2>
+      <a href="https://github.com/PangolinPaw/kitsune" class="btn">View on GitHub</a>
+      <a href="https://github.com/PangolinPaw/kitsune/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/PangolinPaw/kitsune/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h2>
+<a id="kitsune-twitter-interaction-software" class="anchor" href="#kitsune-twitter-interaction-software" aria-hidden="true"><span class="octicon octicon-link"></span></a>KITSUNE Twitter Interaction Software</h2>
 
 <h3>
 <a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h3>
 
-<p>This twitter bot scans recent tweets for the keywords defined in key_word.txt and exctracts
-the senders' user names. It then tweets a response using those names and the text from
-response.txt.</p>
+<p>This Twitter bot is designed to run 24/7 on a Raspberry Pi. It scans recent Tweets for the key words &amp; phrases defined by the user and can then do any (or all) of the following, as pre-set by the user:</p>
 
-<p>The order of keywords and messages in these files is important. I.E. Tweets containing the
-phrase on line 1 of key_word.txt are sent the response from line 1 of response.txt.</p>
+<ul>
+<li>Post a reply to each Tweet found (each search term can have a different, customised response).</li>
+<li>Favourite any Tweets containing the keywords.</li>
+<li>Follow the individual who posted a Tweet containing the keywords.</li>
+</ul>
 
-<p>This allows for automated responses to certain hashtags, key words and phrases; useful for 
-running competitions, advertising or any other project that needs to send large numbers of 
-a large variety of tweets autonomously.</p>
+<p>This allows for automated responses to certain hash-tags, key words and phrases which is useful for running competitions, advertising or any other project that needs to record or reply to a large variety of Tweets autonomously.</p>
 
-<p>Each 'keyword' can be a full boolean search string.
-e.g. 'key +words -RT' would return all tweets containing both 'key' and 'words' but not 'RT'.</p>
+<p>Each search term can be a full boolean search string, as used in the search box on Twitter's website.
+E.G. '+key +words -RT' would return all tweets containing both 'key' and 'words' but not 'RT'.</p>
+
+<p>Within the quotas set by the Twitter API, KITSUNE can work with up to 5 separate search terms, checking for new tweets every 5 minutes.</p>
 
 <h3>
 <a id="possible-future-features" class="anchor" href="#possible-future-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Possible Future Features</h3>
 
 <ul>
 <li>Include images with responses.</li>
-<li>Send email updates of tweets found, responses sent etc. for analytics.</li>
+<li>Send email updates of tweets found, responses sent etc. for analysis.</li>
 <li>Allow for remote addition/editing of keywords and response messages via email.</li>
 </ul>
 
 <h3>
 <a id="please-note" class="anchor" href="#please-note" aria-hidden="true"><span class="octicon octicon-link"></span></a>Please Note</h3>
 
-<p>The kitsune bot relies on a Twitter API. On the first run of the program you will need to
-input all four keys from the API aassociated with your Twitter account. This can be set up
-on <a href="https://apps.twitter.com">https://apps.twitter.com</a> and is free of charge at the time of writing.</p>
+<p>KITSUNE relies on a Twitter API. On the first run of the program you will need to input all four keys from the API associated with your Twitter account. This can be set up on <a href="https://apps.twitter.com">apps.twitter.com</a> and is free of charge at the time of writing.</p>
 
 <h3>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
 
-<p>The control.py script needs to be set to run on boot and the pi needs to automatically reboot
-every 24hrs (via cron). This will ensure software updates that require a reboot are 
-implemented after download without the need for human intervention.</p>
+<p>The control.py script needs to be set to run on boot and the Pi needs to automatically reboot every 24hrs (via cron). This will ensure software updates that require a reboot are implemented after download without the need for human intervention.</p>
 
-<p>Please note that this was designed for a specific use, on a specific SD card and hasn't yet been made flexible enough for distribution to other Raspberry Pis. In particular, the self-updates relies on the scrips being saved in a specific directory that is set up as a local Git repository.</p>
-      </section>
-    </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/PangolinPaw">PangolinPaw</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-              <script type="text/javascript">
+<p>Please note that the current version of KITSUNE was designed for a specific use, on a specific SD card and hasn't yet been made flexible enough for distribution to other Raspberry Pis. In particular, the self-updates relies on the scripts being saved in a specific directory that is set up as a local Git repository.</p>
+
+<h3>
+<a id="contact" class="anchor" href="#contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contact</h3>
+
+<p>Please feel free to leave feedback, comments or suggested improvements via GitHub, or you can email me at <em><a href="mailto:botKITSUNE@gmail.com">botKITSUNE@gmail.com</a></em>.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/PangolinPaw/kitsune">Kitsune</a> is maintained by <a href="https://github.com/PangolinPaw">PangolinPaw</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -91,3 +87,4 @@ implemented after download without the need for human intervention.</p>
 
   </body>
 </html>
+
