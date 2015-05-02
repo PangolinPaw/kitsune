@@ -9,20 +9,20 @@ from twython import Twython, TwythonError	# To interface with Twitter
 import pickle				# To save and load API details
 import os					  # To check for configuration files
 import datetime			# To add timestamps to post history logs
-
+import random 			# To add variation to advert Tweets
 
 # Bot will only post to twitter if this is set to True:
-POST = True
+POST = False
 
 # How many months (minumum) between advert posts?
-rate = 3
+rate = 6
 
 # Configuration files:
 filepath = '/home/pi/kitsune/BOT/'
 postHistory = '%sDATA/postHistory.log' % filepath
 keyFile = '%sDATA/API.dat' % filepath
 
-advert = "Our Twitter account makes use of the KITSUNE social interaction bot. Email botKitsune@gmail.com for info."
+advert = ["Powered by KITSUNE Twitter Interaction Software: http://pangolinpaw.github.io/kitsune", "KITSUNE Twitter Interaction Software supports our social media campaigns http://pangolinpaw.github.io/kitsune", "Twitter competitions powered by KITSUNE Twitter Interaction Software: http://pangolinpaw.github.io/kitsune"]
 
 # ---------------------------------------------------------------------------------------------
 # INITIALIZATION
@@ -120,7 +120,10 @@ def timestamp():
 # INTERACTIONS WITH TWITTER
 
 def postAd(api):
-	if POST: api.update_status(status=advert)
+	try:
+		if POST: api.update_status(status=random.choice(advert))
+	except:
+		print "No advert posted"
 
 # ------------------------------------------------------------------------------------------------
 # MAIN LOOP
