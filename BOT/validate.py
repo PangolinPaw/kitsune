@@ -40,7 +40,7 @@ Details:
 User IP:    %s
 ID number:  %s
 
-UPDATE KEY: %04x""" % (IPaddr, IDnum, updateKey)
+UPDATE KEY: %04x-branch_name""" % (IPaddr, IDnum, updateKey)
 		try:
 			gmail.message('botKitsune@gmail.com', password, 'botKitsune@gmail.com', subject, message)
 		except:
