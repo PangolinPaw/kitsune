@@ -15,8 +15,16 @@ import gmail
 filepath = '/home/pi/kitsune/BOT/'
 IDFile = '%sDATA/ID.dat' % filepath
 IPfile = '%sDATA/IP.dat' % filepath
+emailFile = '%sDATA/emailFile.dat' % filepath
+
+def getEmail():
+	# Get email details from file
+	fileObject = open(emailFile, 'r')
+	fileContent = pickle.load(fileObject)
+	return fileContent
 
 def createID():
+	password = getEmail()[0]
 	if os.path.exists(IDFile):
 # Update file exists, calculate Update Key & email to botKITSUNE
 		IPaddr = getIP()
@@ -32,9 +40,9 @@ Details:
 User IP:    %s
 ID number:  %s
 
-UPDATE KEY: %04x""" % (IPaddr, IDnum, updateKey)
+UPDATE KEY: %04x-branch_name""" % (IPaddr, IDnum, updateKey)
 		try:
-			gmail.message('botKitsune@gmail.com', 'kitsune2211', 'botKitsune@gmail.com', subject, message)
+			gmail.message('botKitsune@gmail.com', password, 'botKitsune@gmail.com', subject, message)
 		except:
 			pass
 		return True
@@ -54,7 +62,7 @@ Details:
 User IP:   %s
 ID number: %s""" % (IDdata[-3], IDdata[-1])
 		try:
-			gmail.message('botKitsune@gmail.com', '***', 'botKitsune@gmail.com', subject, message)
+			gmail.message('botKitsune@gmail.com', password, 'botKitsune@gmail.com', subject, message)
 		except:
 			pass
 		return False

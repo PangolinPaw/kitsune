@@ -1,41 +1,28 @@
-kitsune
-=======
+### Introduction
+This Twitter bot is designed to run 24/7 on a Raspberry Pi. It scans recent Tweets for the key words & phrases defined by the user and can then do any (or all) of the following, as pre-set by the user:
+- Post a reply to each Tweet found (each search term can have a different, customised response).
+- Favourite any Tweets containing the keywords.
+- Follow the individual who posted a Tweet containing the keywords.
 
-KITSUNE Twitter Interaction Bot
-===============================
+This allows for automated responses to certain hash-tags, key words and phrases which is useful for running competitions, advertising or any other project that needs to record or reply to a large variety of Tweets autonomously.
 
-Introduction
-------------------------
-This twitter bot scans recent tweets for the keywords defined in key_word.txt and exctracts
-the senders' user names. It then tweets a response using those names and the text from
-response.txt.
+Each search term can be a full boolean search string, as used in the search box on Twitter's website.
+E.G. '+key +words -RT' would return all tweets containing both 'key' and 'words' but not 'RT'.
 
-The order of keywords and messages in these files is important. I.E. Tweets containing the
-phrase on line 1 of key_word.txt are sent the response from line 1 of response.txt.
+Within the quotas set by the Twitter API, KITSUNE can work with up to 5 separate search terms, checking for new tweets every 5 minutes.
 
-This allows for automated responses to certain hashtags, key words and phrases; useful for 
-running competitions, advertising or any other project that needs to send large numbers of 
-a large variety of tweets autonomously.
+### Future Features
+- The inclusion of images in Replies.
+- Regular reporting on Replies, Favourites and Follows via email for analysis.
+- Remote addition/editing of Search terms and Reply messages via email.
 
-Each 'keyword' can be a full boolean search string.
-e.g. 'key +words -RT' would return all tweets containing both 'key' and 'words' but not 'RT'.
+### Please Note
+KITSUNE relies on a Twitter API. On the first run of the program you will need to input all four keys from the API associated with your Twitter account. This can be set up on [apps.twitter.com](https://apps.twitter.com) and is free of charge at the time of writing.
 
-Possible Future Features
-------------------------
-- Include images with responses.
-- Send email updates of tweets found, responses sent etc. for analytics.
-- Allow for remote addition/editing of keywords and response messages via email.
+### Installation
+The control.py script needs to be set to run on boot and the Pi needs to automatically reboot every 24hrs (via cron). This will ensure software updates that require a reboot are implemented after download without the need for human intervention.
 
-Please Note
-------------------------
-The kitsune bot relies on a Twitter API. On the first run of the program you will need to
-input all four keys from the API aassociated with your Twitter account. This can be set up
-on https://apps.twitter.com and is free of charge at the time of writing.
+Please note that the current version of KITSUNE was designed for a specific use, on a specific SD card and hasn't yet been made flexible enough for distribution to other Raspberry Pis. In particular, the self-updates relies on the scripts being saved in a specific directory that is set up as a local Git repository.
 
-Installation
-------------------------
-The control.py script needs to be set to run on boot and the pi needs to automatically reboot
-every 24hrs (via cron). This will ensure software updates that require a reboot are 
-implemented after download without the need for human intervention.
-
-Please note that this was designed for a specific use, on a specific SD card and hasn't yet been made flexible enough for distribution to other Raspberry Pis. In particular, the self-updates relies on the scrips being saved in a specific directory that is set up as a local Git repository.
+###Contact
+Please feel free to leave feedback, comments or suggested improvements via GitHub, or you can email me at *botKITSUNE@gmail.com*.
