@@ -11,9 +11,13 @@ import advert
 import validate
 
 # Version tracking & clangelog for update screen
-version = 1.7
+version = 1.8
 latest = """ 
-Version %s (latest update):
+Version %s (last update):
+  - Fixed bug that prevented updates.
+  - Minor UI improvements.
+  
+Version %s:
   - Added Favourite function, bot will now favourite Tweets matching it's search terms.
   - Added Favourite and Post controls so replies and auto-favourite can be switched on or off.
   - Re-ordered main menu to incorporate new controls.
@@ -26,7 +30,7 @@ Version %s:
 Version %s
   - Added option to overwrite API details.
   - Improved version tracking.
-  - Self promotion adverts enabled (see EULA: Fees and Marketing).""" % (version, (version - 0.1), (version - 0.2))
+  - Self promotion adverts enabled (see EULA: Fees and Marketing).""" % (version, (version - 0.1), (version - 0.2), (version - 0.3))
 
 filepath = '/home/pi/kitsune/BOT/'
 
