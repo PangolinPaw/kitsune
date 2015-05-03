@@ -207,7 +207,7 @@ def menu():
 %s""" % (version, latest)
    			output = validate.validate()
    			if output[0] == True: # Update Key OK
-				os.system('sudo git --git-dir=/home/pi/kitsune/.git pull origin %s' % output[1]) # Download branch specified by Update Key
+				os.system('sudo git --git-dir=/home/pi/kitsune/.git pull --no-edit origin %s' % output[1]) # Download branch specified by Update Key
 
 				print """ 
    > The software is now up to date and the system will restart so changes can take effect."""
