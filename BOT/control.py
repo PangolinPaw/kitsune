@@ -14,7 +14,7 @@ import validate
 version = 1.8
 latest = """ 
 Version %s (last update):
-  - Fixed bug that prevented updates.
+  - Fixed a bug that prevented updates.
   - Minor UI improvements.
   
 Version %s:
