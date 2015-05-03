@@ -1,6 +1,6 @@
 #!usr/bin/python
 
-# User interface and updater for KITSUNE
+# User interface and update system for KITSUNE
 # --------------------------------------
 
 import time
