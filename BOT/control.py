@@ -82,8 +82,9 @@ def menu():
 		elif selection == '1':
 # Change POST & FOLLOW settings
 			while True:
+				os.system('clear')
 				currentSettings = kitsune.postSetting(['READ', '0', '0'])
-				followOK = currenSettings[1]
+				followOK = currentSettings[1]
 				postOK = currentSettings[2]
 				print """ 
 ----------------------------------------
@@ -97,8 +98,8 @@ def menu():
    - Favourite Tweets = %s
    - Post replies = %s
 
- 1 > Toggle Favouriteing
- 2 > Toggle Posting
+ 1 > Toggle Favourites
+ 2 > Toggle Posts
  3 > Return to main menu""" % (version, followOK, postOK)
 				selection = raw_input('\n   > ')
 				if selection == '1':
@@ -109,18 +110,18 @@ def menu():
 						followOK = True
 
 					# Save changes
-					kitsune.postSettings(['WRITE', followOK, postOK])
+					kitsune.postSetting(['WRITE', followOK, postOK])
 					time.sleep(0.5)
 
 				if selection == '2':
 					# Swap the value of postOK to it's opposite
 					if postOK == True:
 						postOK = False
-					else
+					else:
 						postOK = True
 
 					# Save changes
-					kitsune.postSettings(['WRITE', followOK, postOK])
+					kitsune.postSetting(['WRITE', followOK, postOK])
 					time.sleep(0.5)
 				if selection == '3':
 					break
