@@ -221,7 +221,8 @@ def search(api, postDictionary):
 				if record(user, text, reply) == True:
 					print 'TWEET FOUND:\n%s\n%s' % (user, text)
 					try:
-						if POST: api.update_status(status=reply, in_reply_to_status_id=tweet['id_str'])
+						if POST:
+							api.update_status(status=reply, in_reply_to_status_id=tweet['id_str'])
 							print 'REPLY SENT:\n%s' % reply
 						if FOLLOW:
 						# Follow the poster of the Tweet
@@ -300,8 +301,8 @@ def postSetting(action):
 		pickle.dump(save_data,save_file)
 		save_file.close()
 
-		followOK = save_data('FOLLOW')
-		postOK = save_data('POST')
+		followOK = save_data['FOLLOW']
+		postOK = save_data['POST']
 
 		output = [check, followOK, postOK]
 
@@ -317,7 +318,7 @@ def postSetting(action):
 
 			# Return current settings
 			followOK = load_data['FOLLOW']
-			postOK = load.data['POST']
+			postOK = load_data['POST']
 
 		else:
 			# File has not been created, make it now with default values
@@ -326,8 +327,8 @@ def postSetting(action):
 			pickle.dump(save_data,save_file)
 			save_file.close()
 
-			followOK = save_data('FOLLOW')
-			postOK = save_data('POST')			
+			followOK = save_data['FOLLOW']
+			postOK = save_data['POST']			
 
 		output = [check, followOK, postOK]
 
@@ -351,7 +352,7 @@ def main():
 	api = setup()	# Get access via API
 
 	# Check settings file to see if KITSUNE should post replies or just follow after finding applicable tweets
-	currentSettings = postSettings(['READ', '0', '0'])
+	currentSettings = postSetting(['READ', '0', '0'])
 	global FOLLOW
 	global POST
 	FOLLOW = currentSettings[1]
