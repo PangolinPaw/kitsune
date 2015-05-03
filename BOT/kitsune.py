@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# KITSUNE v2.0
+# KITSUNE v2.1
 # =======
 # Twitter bot that automatically replies to tweets containing specific key words.
 
