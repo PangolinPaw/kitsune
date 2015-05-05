@@ -1,6 +1,6 @@
 #!usr/bin/python
 
-# User interface and updater for KITSUNE
+# User interface and update system for KITSUNE
 # --------------------------------------
 
 import time
@@ -11,11 +11,18 @@ import advert
 import validate
 
 # Version tracking & clangelog for update screen
-version = 1.6
+version = 1.9
 latest = """ 
-Version %s (latest update):
-  - Added Follow function, bot will now follow all individuals it replies to.
-  - Added Follow and Post controls so replies and auto-following can be switched on or off.
+Version %s (last update): 
+  - Implement functionality to Follow users in response to their Tweets.
+
+Version %s:
+  - Fixed a bug that prevented updates.
+  - Minor UI improvements.
+  
+Version %s:
+  - Added Favourite function, bot will now favourite Tweets matching it's search terms.
+  - Added Favourite and Post controls so replies and auto-favourite can be switched on or off.
   - Re-ordered main menu to incorporate new controls.
 
 Version %s:
@@ -26,7 +33,7 @@ Version %s:
 Version %s
   - Added option to overwrite API details.
   - Improved version tracking.
-  - Self promotion adverts enabled (see EULA: Fees and Marketing).""" % (version, (version - 0.1), (version - 0.2))
+  - Self promotion adverts enabled (see EULA: Fees and Marketing).""" % (version, (version - 0.1), (version - 0.2), (version - 0.3), (version - 0.4))
 
 filepath = '/home/pi/kitsune/BOT/'
 
@@ -58,7 +65,7 @@ def menu():
      MAIN MENU
  0 > Start Twitter Bot
 
- 1 > Follow & Post controls
+ 1 > Favourite, Follow & Reply controls
  2 > Search Terms and Responses
  3 > View Interaction History
 
@@ -82,9 +89,11 @@ def menu():
 		elif selection == '1':
 # Change POST & FOLLOW settings
 			while True:
-				currentSettings = kitsune.postSetting(['READ', '0', '0'])
-				followOK = currenSettings[1]
-				postOK = currentSettings[2]
+				os.system('clear')
+				currentSettings = kitsune.postSetting(['READ', '0', '0', '0'])
+				favOK = currentSettings[1]
+				followOK = currentSettings[2]
+				postOK = currentSettings[3]
 				print """ 
 ----------------------------------------
                 KITSUNE		    v%s
@@ -94,35 +103,43 @@ def menu():
      INTERACTION SETTINGS
 
  Current Settings:
-   - Follow users = %s
+   - Favourite Tweets = %s
+   - Follow Users = %s
    - Post replies = %s
 
- 1 > Toggle Following
- 2 > Toggle Posting
- 3 > Return to main menu""" % (version, followOK, postOK)
+ 1 > Toggle Favourites
+ 2 > Toggle Follows
+ 3 > Toggle Posts
+ 4 > Return to main menu""" % (version, favOK, followOK, postOK)
 				selection = raw_input('\n   > ')
 				if selection == '1':
-					# Swap the value of followOK to it's opposite
+					# Swap the value of favOK to it's opposite
+					if favOK == True:
+						favOK = False
+					else:
+						favOK = True
+
+					# Save changes
+					kitsune.postSetting(['WRITE', favOK, followOK, postOK])
+					time.sleep(0.5)
+
+				if selection == '2':
+					# Swap the value of followOK to its opposite
 					if followOK == True:
 						followOK = False
 					else:
 						followOK = True
-
-					# Save changes
-					kitsune.postSettings(['WRITE', followOK, postOK])
-					time.sleep(0.5)
-
-				if selection == '2':
+				if selection == '3':
 					# Swap the value of postOK to it's opposite
 					if postOK == True:
 						postOK = False
-					else
+					else:
 						postOK = True
 
 					# Save changes
-					kitsune.postSettings(['WRITE', followOK, postOK])
+					kitsune.postSetting(['WRITE', favOK, followOK, postOK])
 					time.sleep(0.5)
-				if selection == '3':
+				if selection == '4':
 					break
 				else:
 					print 'Invalid selection, please try again'			
@@ -207,13 +224,13 @@ def menu():
 %s""" % (version, latest)
    			output = validate.validate()
    			if output[0] == True: # Update Key OK
-				os.system('sudo git --git-dir=/home/pi/kitsune/.git pull origin %s' % output[1]) # Download branch specified by Update Key
+				os.system('sudo git --git-dir=/home/pi/kitsune/.git pull --no-edit origin %s' % output[1]) # Download branch specified by Update Key
 
 				print """ 
    > The software is now up to date and the system will restart so changes can take effect."""
-				time.sleep(2)
+				time.sleep(4)
 				# Restart necessary for changes to take effect
-#				os.system('sudo reboot')
+				os.system('sudo reboot')
 			else: # Invalid Update Key
 				print """ 
    > The software update was not successful, please try again."""				
@@ -507,3 +524,4 @@ if __name__ == '__main__':
 			print '\nRebooting menu, please wait...'
 			print '(Press Ctrl+C again to abort)'
 			time.sleep(2)
+
