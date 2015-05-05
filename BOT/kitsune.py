@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# KITSUNE v2.0
+# KITSUNE v2.2
 # =======
 # Twitter bot that automatically replies to tweets containing specific key words.
 
@@ -16,10 +16,10 @@ import signal
 DEBUG = False
 DEBUG2 = False
 
-# Bot will only post to twitter if this is set to True:
+# Bot will follow/favourite/reply ro users if these are True
 POST = True
-# Bot will follow users if this is True
 FOLLOW = True
+FAVOURITE = True
 
 SHUTDOWN = False# If true, Pi will shut down after...
 LIMIT = 95	# ...this many search/response loops
@@ -212,20 +212,31 @@ def search(api, postDictionary):
 					reply = '@%s %s' % (user, message)
 				elif FOLLOW:
 					# Record that we're now following if no message was posted
-					reply = '@%s %s' % (user, '- Followed but did not reply')
+					#reply = '@%s %s' % (user, '- Followed but did not reply')
+					reply = '@%s %s' % (user, '- Followed user, but did not reply')
+				elif FAVOURITE:
+					# Record that we're now following if no message was posted
+					#reply = '@%s %s' % (user, '- Followed but did not reply')
+					reply = '@%s %s' % (user, '- Marked as favourite but did not reply')
+
 				else:
-					# Neither posting or following is switched on, the reply below will be ignored
+					# Posting, following & favourites are all switched off, the reply below will be ignored
 					reply = '@%s %s' % (user, message)
 				
 				if record(user, text, reply) == True:
 					print 'TWEET FOUND:\n%s\n%s' % (user, text)
 					try:
-						if POST: api.update_status(status=reply, in_reply_to_status_id=tweet['id_str'])
+						if POST:
+							api.update_status(status=reply, in_reply_to_status_id=tweet['id_str'])
 							print 'REPLY SENT:\n%s' % reply
 						if FOLLOW:
-						# Follow the poster of the Tweet
+							# Follow the poster of the Tweet
 							api.createFriendship(user_id=tweet['user']['id'])
 							print'NOW FOLLOWING @%s' % user
+						if FAVOURITE:
+						# Favourite the Tweet:
+							api.create_favorite(id=tweet['id_str'])
+							print 'FAVOURITED A TWEET BY %s' % user
 
 					except TwythonError as e:
 						print 'Send error:\n%s' % e
@@ -270,36 +281,38 @@ def nonBlockingInput(prompt='', timeout=20):
 	return ''
 
 # ---------------------------------------------------------------------------------------------
-# CHECK POST/FOLLOW SETTINGS
+# CHECK POST/FAVOURITE SETTINGS
 
 def postSetting(action):
 	# Interacts with the actionFile to determine or change whetrher KITSUNE should follow, reply to or both when 
 	# it encounters an applicable Tweet. The action File contains a dictionary with the following structure:
 
-	# Key 		Item
-	# FOLLOW 	True/False
-	# POST 		True/False 
+	# Key 			Item
+	# FAVOURITE 	True/False
+	# FOLLOW 		TrueFalse
+	# POST 			True/False 
 
 	# Expects the argument:
-	# [action (READ/WRITE), follow users (T/F), reply to tweets (T/F)]
+	# [action (READ/WRITE), follow users (T/F), mark favourite (T/F), reply to tweets (T/F)]
 	# (If action is READ, the subsequent arguments are ignored)
 
 	# Returns the following:
-	# [vaid 'action' argument (T/F), follow users (T/F), reply to tweets (T/F)]
+	# [vaid 'action' argument (T/F), mark favourite (T/F), follow users (T/F), reply to tweets (T/F)]
 
 	if action[0].upper() == 'WRITE':
 		# Change current settings
 		check = True
 
-		save_data = {'FOLLOW':action[1],'POST':action[2]}
+		save_data = {'FAVOURITE':action[1], 'FOLLOW': action[2] 'POST':action[3]}
 		save_file = open(actionFile,'wb')
 		pickle.dump(save_data,save_file)
 		save_file.close()
 
-		followOK = save_data('FOLLOW')
-		postOK = save_data('POST')
+		favOK = save_data['FAVOURITE']
+		followOK = save_data['FOLLOW']
+		postOK = save_data['POST']
 
-		output = [check, followOK, postOK]
+		output = [check, favOK, followOK, postOK]
 
 	if action[0].upper() == 'READ':
 		# Read & return current settings
@@ -312,27 +325,30 @@ def postSetting(action):
 			load_file.close()	
 
 			# Return current settings
+			favOK = load_data['FAVOURITE']
 			followOK = load_data['FOLLOW']
-			postOK = load.data['POST']
+			postOK = load_data['POST']
 
 		else:
 			# File has not been created, make it now with default values
-			save_data = {'FOLLOW':True,'POST':True}
+			save_data = {'FAVOURITE':True, 'FOLLOW':True, 'POST':True}
 			save_file = open(actionFile,'wb')
 			pickle.dump(save_data,save_file)
 			save_file.close()
 
-			followOK = save_data('FOLLOW')
-			postOK = save_data('POST')			
+			favOK = save_data['FAVOURITE']
+			followOK = save_data['FOLLOW']
+			postOK = save_data['POST']			
 
-		output = [check, followOK, postOK]
+		output = [check, favOK, followOK, postOK]
 
 	else:
 		# Invalid argument provided
 		check = False
+		favOK = False
 		followOK = False
 		postOK = False
-		output = [check, followOK, postOK]
+		output = [check, favOK, followOK, postOK]
 
 	return output
 
@@ -347,11 +363,13 @@ def main():
 	api = setup()	# Get access via API
 
 	# Check settings file to see if KITSUNE should post replies or just follow after finding applicable tweets
-	currentSettings = postSettings(['READ', '0', '0'])
+	currentSettings = postSetting(['READ', '0', '0', '0'])
+	global FAVOURITE
 	global FOLLOW
 	global POST
-	FOLLOW = currentSettings[1]
-	POST = currentSettings[2]
+	FAVOURITE = currentSettings[1]
+	FOLLOW = currentSettings[2]
+	POST = currentSettings[3]
 
 	while runBot == True:
 		os.system('clear')
@@ -363,9 +381,9 @@ def main():
   Press Enter to return to the Main Menu
 -------------------------------------------
 Scan interval: %smin          Scan No.: %s
-Follow users = %s    Post replies = %s
+Fav.= %s    Follow = %s 	Reply = %s
 ===========================================
- """ % (interval, loopCount, FOLLOW, POST)
+ """ % (interval, loopCount, FAVOURITE, FOLLOW, POST)
 
 		postDictionary = matchPosts()	# Associate keywords with responses
 		search(api, postDictionary)	# Search twitter for keywords & post responses
