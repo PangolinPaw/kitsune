@@ -3,12 +3,21 @@
 import gmail
 import datetime
 
-sender = 'BOTkitsune@gmail.com'
-password = 'kitsune2211'
+filepath = '/home/pi/kitsuse/BOT/'
+emailFile = '%sDATA/emailFile.dat' % filepath
+postHistory = '%sDATA/postHistory.log' % filepath
+
+def getEmail():
+	# Get email details from file
+	fileObject = open(emailFile, 'r')
+	fileContent = pickle.load(fileObject)
+	return fileContent
 
 def sendAll(to, content):
+	sender = 'botKITSUNE@gmail.com'
+	password = getEmail[0]
 	subject = 'KITSUNE: Full interaction history (manual request)'
-	message = "Below is the full history of Twitter interactions carried out by the KITSUNE bot."
+	message = "Below is the full history of Twitter interactions carried out by the KITSUNE bot. A CSV file of the data is also attached.\n"
 	timeStamp = 0
 	for line in content:
                 line = line.split('|')
@@ -24,7 +33,7 @@ def sendAll(to, content):
 
 		message = '%s\n%s%s%s%s' % (message, lineOne, lineTwo, lineThree, lineFour)
 	
-	gmail.message(sender, password, to, subject, message)
+	gmail.message(sender, password, to, subject, message, postHistory)
 
 def sendRecent(to, content):
 	subject = 'KITSUNE: Recent interaction history.'
@@ -86,7 +95,7 @@ def compareTime(timestamp, currentTime):
 
 if __name__ == '__main__':
 
-        newFile = open('DATA/postHistory.log', 'r', 0)
+        newFile = open(postHistory, 'r', 0)
         history = newFile.read()
         newFile.close()
 
